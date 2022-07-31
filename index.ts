@@ -4,7 +4,6 @@
 import dotenv from "dotenv";
 import express from "express";
 import path from "path";
-import { authorizeLoginData, encryptLoginData } from "./lib/db";
 import bodyParser from "body-parser";
 import router from "./lib/routes";
 
@@ -17,7 +16,6 @@ app.set("views", path.join(__dirname, "..", "public"));
 app.use(express.static(path.join(__dirname, "..", "public", "static")));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/", router);
-
 
 app.listen(80, () => {
 	console.log(`ARRIF BACKEND LISTENING :: PORT 80`);

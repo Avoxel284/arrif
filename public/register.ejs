@@ -18,7 +18,10 @@
 		<div class="credentials-form-container responsive-container">
 			<h1>Sign up</h1>
 			<form class="login-form" action="register" method="post">
-				<%- locals?.formError?.e ? `<a class="form-error">${formError.e}</a>`: ""; %>
+				<div class="form-error" style="display: <%- locals?.formError ? "display" : "none" %>">
+					<img src="imgs/WarningIcon.svg" style="height:24px">
+					<span><%- locals?.formError?.e %></span>
+				</div>
 				<input type="text" aria-label="login input" name="username" placeholder="username" required>
 				<input type="text" aria-label="email input" name="email" placeholder="email" required>
 				<input type="password" aria-label="password input" name="password" placeholder="password" required>

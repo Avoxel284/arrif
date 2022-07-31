@@ -38,6 +38,11 @@
 	color: var(--accent-1);
 }
 
+.form-error {
+	display: none;
+	margin-bottom: 9px;
+}
+
 .form-error span {
 	font-size: 1.1em;
 	vertical-align: super;

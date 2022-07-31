@@ -1,9 +1,8 @@
 // Avoxel284
-// Functions for authentication and stuff
 
-import { User } from "./classes";
-import bcrypt from "bcrypt";
-import { MongoClient, ServerApiVersion } from "mongodb";
+const { User } = require("./classes");
+const { MongoClient, ServerApiVersion } = require("mongodb");
+const bcrypt = require("bcrypt");
 
 const client = new MongoClient(
 	`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`
@@ -13,8 +12,8 @@ export async function checkDuplicateAccount() {
 	const users = (await client).db("db0").collection("users");
 
 	users.findOne({
-		// username: 
-	})
+		// username:
+	});
 
 	// // Username
 	// User.findOne({
@@ -48,8 +47,8 @@ export async function checkDuplicateAccount() {
 /**
  * Encrypt given login data and return it
  */
-export async function encryptLoginData(data: any = {}): Promise<any> {
-	const hash = await bcrypt.hash(data.password, 11).catch((err) => {
+export async function encryptLoginData(data: any) {
+	const hash = await bcrypt.hash(data.password, 11).catch((err: Error) => {
 		throw err;
 	});
 	data.password = hash;
@@ -63,8 +62,8 @@ export async function encryptLoginData(data: any = {}): Promise<any> {
 /**
  * Compare given login data to given hash from DB and return boolean if authorized or not
  */
-export async function authorizeLoginData(data: any = {}, hash: string): Promise<boolean> {
-	const match = await bcrypt.compare(data.password, hash).catch((err) => {
+export async function authorizeLoginData(data: any, hash: string) {
+	const match = await bcrypt.compare(data.password, hash).catch((err: Error) => {
 		throw err;
 	});
 	return match;

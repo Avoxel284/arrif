@@ -1,6 +1,6 @@
-import express, { application } from "express";
+import express from "express";
 import meta from "../cms.json";
-import { authorizeLoginData, encryptLoginData } from "./db";
+import * as db from "./db";
 
 const router = express.Router();
 
@@ -15,12 +15,13 @@ router.get("/login", (req, res) => {
 });
 
 router.post("/login", (req, res) => {
-	res.render("login", {
-		meta,
-		path: req.path,
-		formError: { e: "Username cannot be found", n: "username" },
-	});
+	// res.render("login", {
+	// 	meta,
+	// 	path: req.path,
+	// 	formError: { e: "Username cannot be found", n: "username" },
+	// });
 
+	console.log(req.body);
 	// res.redirect("/dashboard");
 });
 
@@ -31,6 +32,8 @@ router.get("/logout", (req, res) => {
 
 /** Register */
 router.get("/register", (req, res) => {
+	// let authorizeLoginData();
+
 	res.render("register", {
 		meta: meta,
 		path: req.path,
@@ -60,10 +63,4 @@ router.get("/settings", (req, res) => {
 	res.render("settings", { meta: m, user: user, path: req.path });
 });
 
-router.get("/img", (req,res)=>{
-	console.log(req, res);
-	res.sendFile("LogoWhite.png")
-})
-
 export default router;
-// export router;
