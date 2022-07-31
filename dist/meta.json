@@ -1,0 +1,11 @@
+{
+    "hero": {
+        "content": "The planner for",
+        "carouselItems": ["school", "study", "work"],
+        "carouselRate": 4000,
+        "carouselTextAnimationRate": 100
+    },
+    "footer": {
+        "content": "Created by Oliver B for a school project"
+    }
+}

@@ -1,0 +1,42 @@
+.credentials-form {
+	margin-top: 10vh;
+}
+
+.credentials-form form {
+	width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+}
+
+.credentials-form form input {
+	padding: 20px;
+	border-radius: 5px;
+	border: 1px solid white;
+	background-color: transparent;
+	outline: none;
+	color: white;
+	width: 100%;
+	font-size: 15pt;
+	font-family: "elza-text";
+	text-align: left;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+}
+
+.credentials-form form input[type="submit"],
+.credentials-form form input[type="button"] {
+	cursor: pointer;
+	transition: all 0.1s;
+	flex: 1;
+}
+
+.credentials-form form input[type="submit"]:hover,
+.credentials-form form input[type="button"]:hover {
+	background-color: white;
+	color: var(--accent-1);
+}
+
+.login-form {
+}

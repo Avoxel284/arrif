@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="images/IconColour.png">
+	<title>Arrif</title>
+
+	<link rel="stylesheet" href="style/base.css">
+	<link rel="stylesheet" href="style/shapedividers.css">
+	<link rel="stylesheet" href="style/navbar.css">
+	<link rel="stylesheet" href="style/mediaoverride.css">
+</head>
+
+<body>
+	<%- include("templates/navbar") %>
+
+	<section class="hero responsive-flex">
+		<div class="hero-container responsive-container">
+			<!-- <div class="hero-bgimg">
+				<img src="">
+			</div> -->
+
+			<div class="hero-content">
+				<h1>
+					<%= meta.hero.content %>
+					<!-- <svg class="hero-textcursor" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 121">
+						<rect x="-40.5" y="59" width="121" height="3" transform="translate(-40.5 80.5) rotate(-90)" />
+					</svg> -->
+				</h1>
+				<span><%= meta.hero.carouselItems[0] %></span>
+			</div>
+
+			<script>
+				let i = p = 0;
+				let interv;
+				const items = <%- JSON.stringify(meta.hero.carouselItems) %>;
+				const elem = document.querySelector(".hero-content span");
+				const typewriterAnim = (dir) => {
+					elem.textContent = items[i].substring(0, p + dir);
+					p = p + dir;
+					if (elem.textContent === items[i] && dir > 0) {
+						clearInterval(interv);
+						return setTimeout(() => {
+							interv = setInterval(() => {
+								typewriterAnim(-1)
+							}, 50)
+						}, <%- meta.hero.carouselRate %>);
+					}
+
+					if (elem.textContent === "" && dir < 0) {
+						clearInterval(interv);
+						i++; // below is what you call fail proof conditioning
+						if (i >= items.length) i = 0;
+						return setTimeout(() => {
+							interv = setInterval(() => {
+								typewriterAnim(1)
+							}, 100)
+						}, 200);
+					}
+				}
+				interv = setInterval(() => {
+					typewriterAnim(1)
+				}, 100);
+			</script>
+		</div>
+	</section>
+
+	<section class="main responsive-flex">
+		<div class="responsive-container">
+			<button class="cta-button section1-ctabutton" style="width: 100%;">Sign up now</button>
+		</div>
+	</section>
+
+	<%- include("templates/footer.ejs"); %>
+
+	<script src="scripts/anims.js"></script>
+</body>
+
+</html>

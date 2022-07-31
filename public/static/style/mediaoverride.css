@@ -1,0 +1,22 @@
+@media screen and (max-width: 1300px) {
+	:root {
+		--content-width: 80vw;
+	}
+
+	.hero-container {
+		padding: 0;
+	}
+
+	.hero-container h1 {
+		font-size: 3em;
+		line-height: normal;
+	}
+
+	.hero-container span {
+		font-size: 4em;
+	}
+
+	.hero-content {
+		width: 100%;
+	}
+}

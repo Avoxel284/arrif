@@ -1,0 +1,20 @@
+/* All fonts are licensed by Adobe Fonts! */
+
+@import url("https://use.typekit.net/bvl8ydt.css");
+
+:root {
+	/* line-height: 20px; */
+}
+
+h1,
+h2 {
+	font-family: "ice-cream-slant";
+	font-size: 4em;
+	color:white;
+}
+
+p,
+a {
+	font-family: "elza-text";
+	color:white;
+}

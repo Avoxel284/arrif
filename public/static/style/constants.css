@@ -1,0 +1,11 @@
+:root {
+	--accent-1: #54469e;
+	--accent-2: #402663;
+
+	--content-width: 1240px;
+	/* --mobile-width: 100vw; */
+}
+
+* {
+	box-sizing: border-box;
+}

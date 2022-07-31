@@ -1,0 +1,169 @@
+.navbar-container {
+	height: 56px;
+	width: var(--content-width);
+	background-color: transparent;
+	display: flex;
+	list-style-type: none;
+	margin: 30px auto;
+	text-decoration: none;
+	padding: 0;
+	color: white;
+	align-items: flex-start;
+	flex-wrap: nowrap;
+	background: none;
+}
+
+.navbar-logo {
+	height: 56px;
+	order: 0;
+	margin: 0;
+	flex: 1;
+}
+
+.navbar-logo img {
+	height: 100%;
+}
+
+.navbar-item {
+	display: block;
+	order: 1;
+	position: relative;
+	display: block;
+	width: auto;
+	padding: 18px;
+	cursor: pointer;
+}
+
+.navbar-item:after {
+	display: block;
+	content: "";
+	border-bottom: solid 2px;
+	transform: scaleX(0);
+	transition: transform 250ms ease-in-out;
+}
+
+.navbar-item:hover:after {
+	transform: scaleX(1);
+}
+
+.navbar-item.selected::after {
+	transform: scaleX(1);
+}
+
+.navbar-item a {
+	text-decoration: none;
+	color: white;
+	font-size: 20px;
+	font-weight: bold;
+}
+
+.navbar-expand {
+	height: 100%;
+	width: 30px;
+	cursor: pointer;
+	position: relative;
+	align-self: normal;
+	display: none;
+}
+
+.navbar-expand img {
+	height: 100%;
+	width: 100%;
+}
+
+.navbar-mobilebg {
+	position: fixed;
+	top: 0;
+	z-index: 1;
+	background-color: var(--accent-2);
+	height: 0;
+	width: 100vw;
+	transition: height 0.2s;
+}
+
+@media all and (max-width: 768px) {
+	.navbar-container {
+		width: 80vw;
+		align-items: center;
+		justify-content: space-between;
+		flex-wrap: wrap;
+		z-index: 5;
+	}
+
+	.navbar * {
+		z-index: 6;
+	}
+
+	.navbar-logo {
+		margin-bottom: 50px;
+	}
+
+	.navbar-item a {
+		/* display: block; */
+		font-size: 2em;
+		overflow: hidden;
+	}
+
+	.navbar-item {
+		order: 3;
+		width: 100%;
+		text-align: left;
+		padding: 12px 0;
+		opacity: 0;
+		display: none;
+	}
+
+	.navbar-expand {
+		display: block;
+	}
+
+	.navbar[expanded="true"] .navbar-mobilebg {
+		display: block;
+		height: 100vh;
+	}
+
+	.navbar[expanded="true"] .navbar-item {
+		display: block;
+		opacity: 1;
+	}
+}
+
+/* 
+Tablet menu
+@media all and (min-width: 700px) {
+	.menu {
+		justify-content: center;
+	}
+	.logo {
+		flex: 1;
+	}
+	.item.button {
+		width: auto;
+		order: 1;
+		display: block;
+	}
+
+	/* Button up from tablet screen */
+/* .menu li.button a {
+		padding: 10px 15px;
+		margin: 5px 0;
+	}
+	.button a {
+		background: #0080ff;
+		border: 1px royalblue solid;
+	}
+	.button.secondary {
+		border: 0;
+	}
+	.button.secondary a {
+		background: transparent;
+		border: 1px #0080ff solid;
+	}
+	.button a:hover {
+		text-decoration: none;
+	}
+	.button:not(.secondary) a:hover {
+		background: royalblue;
+		border-color: darkblue;
+	}
+} */

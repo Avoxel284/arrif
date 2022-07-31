@@ -1,0 +1,28 @@
+<div expanded="false" class="navbar">
+	<div class="navbar-mobilebg"></div>
+	<ul class="navbar-container">
+		<!-- probably the weirdest code i've ever written -->
+		<% i=0; function s() { i++; if (i-1==psId) return "selected"; } %>
+		<li class="navbar-logo"><img src="images/LogoWhite.svg"></li>
+		<li class="navbar-item <%- s() %>"><a href="/">Home</a></li>
+		<li class="navbar-item <%- s() %>"><a href="/login">Login</a></li>
+		<li class="navbar-item <%- s() %>"><a href="#">Sign up</a></li>
+		<!-- <li class="navbar-item"><a href="#">About us</a></li> -->
+		<li class="navbar-expand" onclick="navbarExpandToggle()"><img src="images/HamburgerIcon.svg"></li>
+	</ul>
+
+	<script>
+		function navbarExpandToggle() {
+			let navbarElement = document.querySelector(".navbar");
+			if (navbarElement.getAttribute("expanded") == "true") {
+				navbarElement.setAttribute("expanded", "false")
+				document.body.style.overflow = "unset"
+				document.querySelector("html").style.overflow = "unset"
+			} else {
+				navbarElement.setAttribute("expanded", "true");
+				document.body.style.overflow = "hidden"
+				document.querySelector("html").style.overflow = "unset"
+			}
+		}
+	</script>
+</div>
