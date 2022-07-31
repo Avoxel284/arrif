@@ -38,5 +38,13 @@
 	color: var(--accent-1);
 }
 
-.login-form {
+.form-error span {
+	font-size: 1.1em;
+	vertical-align: super;
+}
+
+.form-error img {
+	display: inline-block;
+	height: 24px;
+	margin-right: 10px;
 }

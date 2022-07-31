@@ -1,0 +1,47 @@
+{
+	"hero": {
+		"content": "The planner for",
+		"carouselItems": ["school", "study", "work"],
+		"carouselRate": 4000,
+		"carouselTextAnimationRate": 100
+	},
+	"ctaButtonContent": {
+		"section1-PostHero": ["Sign up now", "Go to dashboard"]
+	},
+	"navbar": {
+		"logoUrl": "imgs/LogoWhite.svg",
+		"pages": [
+			[
+				{
+					"u": "/",
+					"n": "Home"
+				},
+				{
+					"u": "/login",
+					"n": "Login"
+				},
+				{
+					"u": "/register",
+					"n": "Sign up"
+				}
+			],
+			[
+				{
+					"u": "/dashboard",
+					"n": "Dashboard"
+				},
+				{
+					"u": "/settings",
+					"n": "Settings"
+				},
+				{
+					"u": "/logout",
+					"n": "Logout"
+				}
+			]
+		]
+	},
+	"footer": {
+		"content": "Created by Oliver B for a school project"
+	}
+}

@@ -10,11 +10,12 @@ h1,
 h2 {
 	font-family: "ice-cream-slant";
 	font-size: 4em;
-	color:white;
+	color: white;
 }
 
 p,
-a {
+a,
+span {
 	font-family: "elza-text";
-	color:white;
+	color: white;
 }

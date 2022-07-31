@@ -4,12 +4,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="images/IconColour.png">
+	<link rel="icon" href="imgs/IconColour.png">
 	<title>Arrif</title>
 
 	<link rel="stylesheet" href="style/base.css">
 	<link rel="stylesheet" href="style/shapedividers.css">
-	<link rel="stylesheet" href="style/navbar.css">
 	<link rel="stylesheet" href="style/mediaoverride.css">
 </head>
 
@@ -69,13 +68,11 @@
 
 	<section class="main responsive-flex">
 		<div class="responsive-container">
-			<button class="cta-button section1-ctabutton" style="width: 100%;">Sign up now</button>
+			<button class="cta-button section1-ctabutton" style="width: 100%;"><%= meta.ctaButtonContent["section1-PostHero"][locals.user ? 1 : 0] %></button>
 		</div>
 	</section>
 
 	<%- include("templates/footer.ejs"); %>
-
-	<script src="scripts/anims.js"></script>
 </body>
 
 </html>

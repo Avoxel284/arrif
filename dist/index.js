@@ -7,33 +7,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dotenv_1 = __importDefault(require("dotenv"));
 const express_1 = __importDefault(require("express"));
-const mongodb_1 = require("mongodb");
 const path_1 = __importDefault(require("path"));
-const meta_json_1 = __importDefault(require("./meta.json"));
+const body_parser_1 = __importDefault(require("body-parser"));
+const routes_1 = __importDefault(require("./lib/routes"));
 dotenv_1.default.config();
-const port = 5001;
 const app = (0, express_1.default)();
-const apiRouter = express_1.default.Router();
-const mango = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`);
-app.use(express_1.default.static(path_1.default.join(__dirname, "..", "public", "static")));
 app.set("view engine", "ejs");
 app.set("views", path_1.default.join(__dirname, "..", "public"));
-mango.connect((err) => {
-    const collection = mango.db("test").collection("devices");
-    // perform actions on the collection object
-    mango.close();
-});
-app.get("/", (req, res) => {
-    res.render("index", { meta: meta_json_1.default, psId: 0 });
-});
-app.get("/login", (req, res) => {
-    res.render("login", { meta: meta_json_1.default, psId: 1 });
-});
-app.post("/login", (req, res) => {
-    console.log(req.body);
-    res.redirect("/dashboard");
-    // res.send(`auughhhhhhh`);
-});
+app.use(express_1.default.static(path_1.default.join(__dirname, "..", "public", "static")));
+app.use(body_parser_1.default.urlencoded({ extended: true }));
+app.use("/", routes_1.default);
 app.listen(80, () => {
     console.log(`ARRIF BACKEND LISTENING :: PORT 80`);
 });

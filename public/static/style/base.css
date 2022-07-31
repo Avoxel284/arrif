@@ -1,5 +1,6 @@
 @import url("./constants.css");
 @import url("./fonts.css");
+@import url("./navbar.css");
 @import url("./mediaoverride.css");
 
 body {
@@ -57,8 +58,8 @@ body {
 	height: 100%;
 	width: 100%;
 	top: 0;
-	mask-image: url("../images/HeroMask.png");
-	-webkit-mask-image: url("../images/HeroMask.png");
+	mask-image: url("../imgs/HeroMask.png");
+	-webkit-mask-image: url("../imgs/HeroMask.png");
 	mask-type: alpha;
 	-webkit-mask-type: luminance;
 	mask-size: contain;
