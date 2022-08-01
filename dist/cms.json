@@ -8,6 +8,23 @@
     "ctaButtonContent": {
         "section1-PostHero": ["Sign up now", "Go to dashboard"]
     },
+    "forms": {
+        "login": {
+            "t": "Login",
+            "f": [
+                { "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
+                { "n": "password", "t": "password" }
+            ]
+        },
+        "register": {
+            "t": "Sign up",
+            "f": [
+                { "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
+                { "n": "email", "t": "text", "p": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$" },
+                { "n": "password", "t": "password" }
+            ]
+        }
+    },
     "navbar": {
         "logoUrl": "imgs/LogoWhite.svg",
         "pages": [

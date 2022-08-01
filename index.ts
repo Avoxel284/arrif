@@ -2,18 +2,18 @@
 // Arrif Planner Backend
 
 import dotenv from "dotenv";
+dotenv.config();
 import express from "express";
 import path from "path";
 import bodyParser from "body-parser";
 import router from "./lib/routes";
-
-dotenv.config();
 
 const app = express();
 
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "public"));
 app.use(express.static(path.join(__dirname, "..", "public", "static")));
+app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use("/", router);
 

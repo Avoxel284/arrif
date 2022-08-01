@@ -9,18 +9,48 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authorizeLoginData = exports.encryptLoginData = exports.checkDuplicateAccount = void 0;
-const { User } = require("./classes");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const bcrypt = require("bcrypt");
-const client = new MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
-function checkDuplicateAccount() {
+exports.authorizeLoginData = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = void 0;
+const mongodb_1 = require("mongodb");
+const bcrypt_1 = __importDefault(require("bcrypt"));
+const cms_json_1 = __importDefault(require("../cms.json"));
+const client = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
+function checkFormData(data, formType) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const nullFields = [];
+        const invalidFields = [];
+        cms_json_1.default.forms[formType].f.forEach((f) => {
+            if (!data[f.n])
+                return nullFields.push(f.n);
+            if (f.p && !new RegExp(f.p).test(data[f.n]))
+                return invalidFields.push(f.n);
+        });
+        if (nullFields.length > 0)
+            return { msg: "Required fields are not filled out", fields: nullFields };
+        if (invalidFields.length > 0)
+            return { msg: "Field(s) are invalid", fields: invalidFields };
+        if (data.password.length < 8)
+            return { msg: "Password must at least have 8 characters", fields: "password" };
+    });
+}
+exports.checkFormData = checkFormData;
+function checkDupAcc(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = (yield client).db("db0").collection("users");
-        users.findOne({
-        // username:
+        yield users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
+        const dupUser = yield users.findOne({
+            $or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
         });
+        if (!dupUser)
+            return;
+        if (dupUser.email.toLowerCase() == data.email.toLowerCase())
+            return { msg: "Email is already in use.", fields: ["email"] };
+        if (dupUser.username.toLowerCase() == data.username.toLowerCase())
+            return { msg: "Username is already taken.", fields: ["username"] };
+        return;
         // // Username
         // User.findOne({
         // 	username: req.body.username,
@@ -50,13 +80,13 @@ function checkDuplicateAccount() {
         // });
     });
 }
-exports.checkDuplicateAccount = checkDuplicateAccount;
+exports.checkDupAcc = checkDupAcc;
 /**
  * Encrypt given login data and return it
  */
 function encryptLoginData(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const hash = yield bcrypt.hash(data.password, 11).catch((err) => {
+        const hash = yield bcrypt_1.default.hash(data.password, 11).catch((err) => {
             throw err;
         });
         data.password = hash;
@@ -72,7 +102,7 @@ exports.encryptLoginData = encryptLoginData;
  */
 function authorizeLoginData(data, hash) {
     return __awaiter(this, void 0, void 0, function* () {
-        const match = yield bcrypt.compare(data.password, hash).catch((err) => {
+        const match = yield bcrypt_1.default.compare(data.password, hash).catch((err) => {
             throw err;
         });
         return match;

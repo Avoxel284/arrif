@@ -1,3 +1,6 @@
+// Avoxel284
+// Util functions
+
 /**
  * Removes an element from an array and returns it
  */

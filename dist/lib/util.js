@@ -1,4 +1,6 @@
 "use strict";
+// Avoxel284
+// Util functions
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.arrayRm = void 0;
 /**

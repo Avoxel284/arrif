@@ -1,19 +1,42 @@
 // Avoxel284
 
-const { User } = require("./classes");
-const { MongoClient, ServerApiVersion } = require("mongodb");
-const bcrypt = require("bcrypt");
+import { User } from "./classes";
+import { MongoClient, ServerApiVersion } from "mongodb";
+import bcrypt from "bcrypt";
+import meta from "../cms.json";
 
 const client = new MongoClient(
 	`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`
 ).connect();
 
-export async function checkDuplicateAccount() {
-	const users = (await client).db("db0").collection("users");
-
-	users.findOne({
-		// username:
+export async function checkFormData(data: any, formType: "register" | "login") {
+	const nullFields: any[] = [];
+	const invalidFields: any[] = [];
+	meta.forms[formType].f.forEach((f) => {
+		if (!data[f.n]) return nullFields.push(f.n);
+		if (f.p && !new RegExp(f.p).test(data[f.n])) return invalidFields.push(f.n);
 	});
+	if (nullFields.length > 0)
+		return { msg: "Required fields are not filled out", fields: nullFields };
+	if (invalidFields.length > 0) return { msg: "Field(s) are invalid", fields: invalidFields };
+	if (data.password.length < 8)
+		return { msg: "Password must at least have 8 characters", fields: "password" };
+}
+
+export async function checkDupAcc(data: any) {
+	const users = (await client).db("db0").collection("users");
+	await users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
+
+	const dupUser = await users.findOne({
+		$or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
+	});
+
+	if (!dupUser) return;
+	if (dupUser.email.toLowerCase() == data.email.toLowerCase())
+		return { msg: "Email is already in use.", fields: ["email"] };
+	if (dupUser.username.toLowerCase() == data.username.toLowerCase())
+		return { msg: "Username is already taken.", fields: ["username"] };
+	return;
 
 	// // Username
 	// User.findOne({

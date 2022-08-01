@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="imgs/IconColour.png">
+	<title><%= meta.forms[locals.formType].t %> - Arrif</title>
+
+	<link rel="stylesheet" href="style/base.css">
+	<link rel="stylesheet" href="style/forms.css">
+</head>
+
+<body>
+	<%- include("templates/navbar") %>
+
+	<section class="credentials-form responsive-flex">
+		<div class="credentials-form-container responsive-container">
+			<h1><%= meta.forms[locals.formType].t %></h1>
+			<form id="form" onsubmit="event.preventDefault(); submitOnboardingForm();">
+				<div id="form-error">
+					<img src="imgs/WarningIcon.svg" style="height:24px">
+					<span id="form-error-msg"></span>
+				</div>
+				<%- meta.forms[locals.formType].f.map((v, i) => `<input type="${v.t}" aria-label="login input" name="${v.n}" placeholder="${v.n}">`).join("\n"); %>
+				<input type="submit" value="submit">
+				<%- locals.formType == "login" ? `<input type="button" value="forgot password?" onclick="window.location.href = 'https://www.wikihow.com/Remember-a-Forgotten-Password'">` : "" %>
+			</form>
+		</div>
+	</section>
+
+	<%- include("templates/footer") %>
+
+	<script>
+		async function submitOnboardingForm() {
+			const data = {};
+			const headers = new Headers();
+			const inputs = await document.querySelectorAll(".credentials-form-container form input")
+			inputs.forEach((e) => {
+				if (["text", "password"].includes(e.getAttribute("type"))) data[e.getAttribute("name")] = e.value;
+			});
+			headers.append("Content-Type", "application/json");
+			return await fetch(window.location.href, {
+				body: JSON.stringify(data),
+				headers: headers,
+				method: "POST",
+				redirect: "follow"
+			}).then(async (res) => {
+				if (res.status == 400 && res.headers.get("Content-Type").startsWith("application/json")) res = await res.json()
+				if (res.fields && res.msg) {
+					inputs.forEach((i) => {
+						if (res.fields.includes(i.getAttribute("name"))) i.style.borderColor = "red";
+						else i.style.borderColor = "unset";
+					})
+					document.querySelector("#form #form-error").style.display = "block";
+					document.querySelector("#form #form-error #form-error-msg").textContent = res.msg;
+				} else {
+					window.location = res.url
+				}
+			})
+		}
+	</script>
+</body>
+
+</html>
