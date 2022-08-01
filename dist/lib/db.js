@@ -18,6 +18,7 @@ const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cms_json_1 = __importDefault(require("../cms.json"));
 const client = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
+exports.default = (await client).db("db0");
 function checkFormData(data, formType) {
     return __awaiter(this, void 0, void 0, function* () {
         const nullFields = [];
@@ -51,33 +52,6 @@ function checkDupAcc(data) {
         if (dupUser.username.toLowerCase() == data.username.toLowerCase())
             return { msg: "Username is already taken.", fields: ["username"] };
         return;
-        // // Username
-        // User.findOne({
-        // 	username: req.body.username,
-        // }).exec((err, user) => {
-        // 	if (err) {
-        // 		res.status(500).send({ message: err });
-        // 		return;
-        // 	}
-        // 	if (user) {
-        // 		res.status(400).send({ message: "Failed! Username is already in use!" });
-        // 		return;
-        // 	}
-        // 	// Email
-        // 	User.findOne({
-        // 		email: req.body.email,
-        // 	}).exec((err, user) => {
-        // 		if (err) {
-        // 			res.status(500).send({ message: err });
-        // 			return;
-        // 		}
-        // 		if (user) {
-        // 			res.status(400).send({ message: "Failed! Email is already in use!" });
-        // 			return;
-        // 		}
-        // 		next();
-        // 	});
-        // });
     });
 }
 exports.checkDupAcc = checkDupAcc;
