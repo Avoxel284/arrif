@@ -2,3 +2,4 @@ node_modules/
 .env
 archive/
 .log
+.DS_Store
