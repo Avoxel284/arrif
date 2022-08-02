@@ -23,7 +23,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateAuthToken = exports.generateId = exports.verifyAuthToken = void 0;
 const jwt = __importStar(require("jsonwebtoken"));
 const crypto = __importStar(require("crypto"));
-const authenticated = {};
 function verifyAuthToken(token) {
     try {
         return jwt.verify(token, process.env.AUTH_TOKEN);
@@ -34,10 +33,17 @@ function verifyAuthToken(token) {
 }
 exports.verifyAuthToken = verifyAuthToken;
 /**
- * Generate a random id
+ * Generate a random user id
  */
-function generateId() {
-    return crypto.randomBytes(26).toString("hex");
+function generateId(type = "hex") {
+    if (type == "hex")
+        return crypto.randomBytes(26).toString("hex");
+    else if (type == "num") {
+        const time = Date.now();
+        const bTime = time.toString(8);
+        return time;
+    }
+    return;
 }
 exports.generateId = generateId;
 /**

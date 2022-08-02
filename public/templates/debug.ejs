@@ -1,0 +1,8 @@
+<% if (locals?.debugMenu) { %>
+<div id="debugMenu" style="position:fixed; bottom: 5px; left:5px; font-size:11px;">
+	<span><b>DEBUG MENU</b></span><br>
+	<span>USER ID: <%= locals?.user?.id %></span><br>
+	<span>USERNAME: <%= locals?.user?.username %></span><br>
+	<span>SESSION TOKEN: <%= locals?.sessionToken %></span><br>
+</div>
+<% } %>

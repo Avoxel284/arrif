@@ -8,17 +8,34 @@
 	<title>Dashboard - Arrif</title>
 
 	<link rel="stylesheet" href="/style/base.css">
-	<link rel="stylesheet" href="/style/forms.css">
+	<link rel="stylesheet" href="/style/schedule.css">
 </head>
 
 <body>
 	<%- include("templates/navbar") %>
 
-	<section class="dashboard">
+	<section class="responsive-flex">
+		<div class="responsive-container">
+			<h1><%= welcomeText %>, <%= locals?.user?.username %>!</h1>
 
+			<div class="upnext">
+				<h2>Up next</h2>
+				<% schedule.upnext.forEach(e => { %>
+				<div class="schedule-event">
+					<div>
+						<span class="schedule-event-title"><%= e.name %></span>
+						<span class="schedule-event-desc"><%= e.desc %></span>
+						<span class="schedule-event-footer"><%= e.footer %></span>
+					</div>
+					<span class="schedule-event-time"><%= e.time %></span>
+				</div>
+				<% }) %>
+			</div>
+		</div>
 	</section>
 
 	<%- include("templates/footer") %>
+	<%- include("templates/debug") %>
 </body>
 
 </html>

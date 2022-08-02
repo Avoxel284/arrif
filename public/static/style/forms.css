@@ -2,14 +2,14 @@
 	margin-top: 10vh;
 }
 
-.credentials-form form {
+form {
 	width: 100%;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
 }
 
-.credentials-form form input {
+form input {
 	padding: 20px;
 	border-radius: 5px;
 	border: 1px solid white;
@@ -25,17 +25,34 @@
 	appearance: none;
 }
 
-.credentials-form form input[type="submit"],
-.credentials-form form input[type="button"] {
+form input[type="submit"],
+form input[type="button"] {
 	cursor: pointer;
 	transition: all 0.1s;
 	flex: 1;
 }
 
-.credentials-form form input[type="submit"]:hover,
-.credentials-form form input[type="button"]:hover {
+form input[type="submit"]:hover,
+form input[type="button"]:hover {
 	background-color: white;
 	color: var(--accent-1);
+}
+
+form label {
+	color: white;
+	font-family: "elza-text";
+	position: relative;
+	width: max-content;
+}
+
+form label span {
+	position: absolute;
+	top: 5px;
+	left: 16px;
+	padding: 0 5px;
+	background-color: var(--accent-1);
+	width: inherit;
+	word-wrap: normal;
 }
 
 #form-error {
@@ -52,4 +69,13 @@
 	display: inline-block;
 	height: 24px;
 	margin-right: 10px;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+	-webkit-box-shadow: 0 0 0 30px var(--accent-1) inset !important;
+	-webkit-text-fill-color: white !important;
+	-webkit-text-size-adjust: none !important;
 }

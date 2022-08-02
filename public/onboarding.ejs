@@ -22,7 +22,12 @@
 					<img src="imgs/WarningIcon.svg" style="height:24px">
 					<span id="form-error-msg"></span>
 				</div>
-				<%- meta.forms[locals.formType].f.map((v, i) => `<input type="${v.t}" aria-label="login input" name="${v.n}" placeholder="${v.n}">`).join("\n"); %>
+				<% meta.forms[locals.formType].f.forEach(v => { %>
+				<label>
+					<span><%= v.l %></span>
+				</label>
+				<input type="<%= v.t %>" name="<%= v.n %>">
+				<% }) %>
 				<input type="submit" value="submit">
 				<%- locals.formType == "login" ? `<input type="button" value="forgot password?" onclick="window.location.href = 'https://www.wikihow.com/Remember-a-Forgotten-Password'">` : "" %>
 			</form>
@@ -30,6 +35,7 @@
 	</section>
 
 	<%- include("templates/footer") %>
+	<%- include("templates/debug") %>
 
 	<script>
 		async function submitOnboardingForm() {
@@ -37,7 +43,7 @@
 			const headers = new Headers();
 			const inputs = await document.querySelectorAll(".credentials-form-container form input")
 			inputs.forEach((e) => {
-				if (["text", "password"].includes(e.getAttribute("type"))) data[e.getAttribute("name")] = e.value;
+				if (["text", "password", "email"].includes(e.getAttribute("type"))) data[e.getAttribute("name")] = e.value;
 			});
 			headers.append("Content-Type", "application/json");
 			return await fetch("<%= meta.forms[locals.formType].a %>", {

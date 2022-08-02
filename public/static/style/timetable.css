@@ -2,11 +2,12 @@
 	width: 100%;
 	color: white;
 	border: solid 1px white;
+	border: none;
 	border-radius: 5px;
 	padding: 10px;
 	font-family: "elza-text";
 	text-align: center;
-	border-collapse: separate;
+	border-collapse: collapse;
 	border-spacing: 6px;
 }
 
@@ -44,7 +45,7 @@
 }
 
 .timetable-event *:active {
-	border:red;
+	border: red;
 }
 
 .timetable-period {

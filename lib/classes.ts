@@ -7,8 +7,6 @@ export class User {
 	email: string;
 	/** User Id, same as document id */
 	id: string;
-	/** User's token - password but more dangerous. Encoded in Base64*/
-	token: string;
 	/** Settings */
 	settings: {
 		/** Super dark mode theme */
@@ -20,8 +18,7 @@ export class User {
 		this.password = data.password;
 		this.email = data.email;
 		this.settings = data.settings;
-		this.id = data._id;
-		this.token = data.token;
+		this.id = data.id;
 	}
 }
 

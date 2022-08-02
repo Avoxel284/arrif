@@ -10,24 +10,38 @@ import * as path from "path";
 
 const router = express.Router();
 
+router.use(async (req, res, next) => {
+	const token = req.cookies?.["arrif-session"] && verifyAuthToken(req.cookies?.["arrif-session"]);
+	if (token && token?.id) res.locals.user = await db.get("users", { id: token.id });
+
+	res.locals.meta = meta;
+	res.locals.path = req.path;
+	res.locals.sessionToken = req.cookies?.["arrif-session"];
+	res.locals.debugMenu = process.env.NODE_ENV != "PRODUCTION";
+	next();
+});
+
 /** Root */
 router.get("/", async (req, res) => {
-	res.render("index", { meta: meta, path: req.path });
+	res.render("index");
 });
 
 /** Login */
 router.get("/login", async (req, res) => {
-	res.render("onboarding", { meta: meta, path: req.path, formType: "login" });
+	res.render("onboarding", { formType: "login" });
 });
 
 router.post("/auth", async (req, res) => {
 	if (req.headers["content-type"] !== "application/json")
 		return res.status(400).send(`Invalid content type`);
+
 	const checkFormData = await db.checkFormData(req.body, "login");
 	if (checkFormData instanceof FormError) return res.status(400).send(checkFormData);
 
 	const user = await db.matchUser(req.body);
 	if (user instanceof FormError) return res.status(400).send(user);
+
+	res.cookie("arrif-session", generateAuthToken(user.id));
 
 	if (req.query.callback) return res.redirect(req.query.callback as string);
 	res.sendStatus(200);
@@ -35,14 +49,13 @@ router.post("/auth", async (req, res) => {
 
 /** Logout */
 router.get("/logout", async (req, res) => {
+	res.clearCookie("arrif-session");
 	res.redirect("/");
 });
 
 /** Register */
 router.get("/register", async (req, res) => {
 	res.render("onboarding", {
-		meta: meta,
-		path: req.path,
 		formType: "register",
 	});
 });
@@ -57,8 +70,9 @@ router.post("/register", async (req, res) => {
 	const checkDupAcc = await db.checkDupAcc(req.body);
 	if (checkDupAcc instanceof FormError) return res.status(400).send(checkDupAcc);
 
-	db.addUser(req.body);
-	res.cookie("arrif-session", "session");
+	const user = await db.addUser(req.body);
+
+	res.cookie("arrif-session", generateAuthToken(user.id));
 	return res.redirect("/dashboard");
 
 	// res.send(`${req.body.username}:${req.body.password}:${req.body.email}`);
@@ -66,32 +80,69 @@ router.post("/register", async (req, res) => {
 
 /** Dashboard */
 router.get("/dashboard", async (req, res) => {
-	const token = req.headers["authorization"] && verifyAuthToken(req.headers["authorization"]);
-	if (!token || !token?.id)
-		return res
-			.status(401)
-			.render("error", { err: "401 Unauthorized", msg: "Trying to forge JWTs now huh?" });
+	const token = req.cookies?.["arrif-session"] && verifyAuthToken(req.cookies?.["arrif-session"]);
+
+	if (!token || !token?.id) return res.redirect("/login");
 
 	const user = await db.get("users", { id: token.id });
-	if (!user) res.redirect("/");
+	if (!user) return res.redirect("/");
 
-	// const token = authenticateToken(req, res);
-	// if (!token) return res.sendStatus(403);
-	res.render("dashboard", { meta: meta, user: user, path: req.path });
+	const hours = new Date().getHours();
+	let welcomeText = "Morning";
+	if (hours > 12 && hours < 18) welcomeText = "Afternoon";
+	else if (hours > 18) welcomeText = "Evening";
+
+	let schedule = {
+		upnext: [
+			{
+				name: "English",
+				desc: "With Mr Chen in D6",
+				time: "8:55am",
+				footer: "from Week A timetable",
+			},
+			{
+				name: "Math",
+				desc: "With Mr Chen in D6",
+				time: "10:00am",
+				footer: "from Week A timetable",
+			},
+			{
+				name: "Recess",
+				desc: "-",
+				time: "11:05am",
+				footer: "from Week A timetable",
+			},
+		],
+	};
+
+	res.render("dashboard", { welcomeText: welcomeText, schedule: schedule });
 });
 
 /** Settings */
 router.get("/settings", async (req, res) => {
-	let m = meta;
-	let user = {
-		username: "username",
-	};
-	res.render("settings", { meta: m, user: user, path: req.path });
+	res.render("settings", {
+		settings: [
+			{
+				l: "Username",
+				t: "text",
+				n: "username",
+			},
+			{
+				l: "Password",
+				t: "password",
+				n: "password",
+			},
+			{
+				l: "Username",
+				t: "text",
+				n: "username",
+			},
+		],
+	});
 });
 
 router.put("/settings", async (req, res) => {
 	const user = await db.get("users", { _id: new ObjectId(req.body.userId) });
-	console.log(req.body.userId);
 	if (!user) return res.status(401).send("Could not find requested user");
 
 	db.updateField("users", { _id: user._id }, { settings: { "": "auughhh" } });
@@ -110,7 +161,7 @@ router.get("/timetable/:id", async (req, res) => {
 				msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
 			});
 
-		const p = (d: any) => `<td class="timetable-event">
+		const e = (d: any) => `<td class="timetable-event">
 			<span contenteditable class="timetable-event-title">${d.name}</span>
 			<span contenteditable class="timetable-event-loc">${d.loc}</span><br>
 			<span contenteditable class="timetable-event-desc">${d.desc}</span>
@@ -120,13 +171,16 @@ router.get("/timetable/:id", async (req, res) => {
 		const numPeriods = days[0][1].length;
 		const rows: any = [];
 
+		// days.map((d)=>{
+
+		// })
+
 		for (let i = 0; i < numPeriods; i++)
 			rows.push(
-				`<td class="timetable-period">${i}</td>` + days.map((d: any) => p(d[1][i])).join("")
+				`<td class="timetable-period">${i}</td>` + days.map((d: any) => e(d[1][i])).join("")
 			);
 
 		res.render("timetable", {
-			meta: meta,
 			tt: {
 				...timetable,
 				html: {
@@ -136,23 +190,20 @@ router.get("/timetable/:id", async (req, res) => {
 			},
 			path: req.path,
 		});
+		// const firstRow =
 	} else {
 		const timetable = {
-			id: generateId(),
+			id: generateId("num"),
 			name: "New Timetable",
 			repeats: 1,
-			days: {
-				Monday: [],
-				Tuesday: [],
-				Wednesday: [],
-				Thursday: [],
-				Friday: [],
-				Saturday: [],
+			days: [],
+			html: {
+				rows: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+				headers: ["Day", ...util.genArrayFromRange(0, 6)],
 			},
-			html: {},
 		};
 
-		res.render("timetable", { meta: meta, path: req.path, tt: timetable });
+		res.render("timetable", { tt: timetable });
 	}
 });
 

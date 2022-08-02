@@ -1,0 +1,43 @@
+.schedule-event {
+	padding: 10px;
+	font-family: "elza-text";
+	border: 1px solid white;
+	border-radius: 5px;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	margin-bottom: 10px;
+}
+
+.schedule-event-title {
+	font-size: 2.7em;
+	font-family: "ice-cream-slant";
+	padding-bottom: 5px;
+	display: block;
+}
+
+.schedule-event-desc {
+	padding-bottom: 3px;
+	font-size: 1.2em;
+	display: block;
+}
+
+.schedule-event-footer {
+	padding-bottom: 0px;
+	font-size: 0.8em;
+	display: block;
+}
+
+.schedule-event-time {
+	font-size: 5em;
+	vertical-align: middle;
+	font-weight: bold;
+	margin-left: auto;
+}
+
+@media all and (max-width: 768px) {
+	.schedule-event-time {
+		padding-top: 10px;
+		font-size: 3.5em;
+	}
+}

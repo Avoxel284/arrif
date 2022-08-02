@@ -93,9 +93,12 @@ function addUser(data) {
             email: data.email.toLowerCase(),
             password: bcrypt_1.default.hashSync(data.password, 10),
             id: auth.generateId(),
+            settings: {
+                darkMode: false,
+            },
             // token: auth.generateUserToken(),
         });
-        return new classes_1.User(user);
+        return new classes_1.User(yield get("users", { _id: user.insertedId }));
     });
 }
 exports.addUser = addUser;
@@ -120,7 +123,7 @@ function matchUser(data) {
 }
 exports.matchUser = matchUser;
 /**
- * Returns a document in a given
+ * Returns a document in a given collection with a given filter
  */
 function get(collection, filter) {
     return __awaiter(this, void 0, void 0, function* () {

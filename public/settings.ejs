@@ -8,16 +8,30 @@
 	<title>Settings - Arrif</title>
 
 	<link rel="stylesheet" href="/style/base.css">
+	<link rel="stylesheet" href="/style/forms.css">
 </head>
 
 <body>
 	<%- include("templates/navbar") %>
 
-	<section class="dashboard">
-
+	<section class="responsive-flex">
+		<div class="responsive-container">
+			<h1>Settings</h1>
+			<form class="" method="dialog" autocomplete="off">
+				<% locals.settings.forEach(v => { %>
+				<label>
+					<span><%= v.l %></span>
+				</label>
+				<input type="<%= v.t %>" name="<%= v.n %>" autocomplete="off">
+				<% }) %>
+				<input type="submit" value="update">
+			</form>
+		</div>
 	</section>
 
 	<%- include("templates/footer") %>
+	<%- include("templates/debug") %>
+
 </body>
 
 </html>

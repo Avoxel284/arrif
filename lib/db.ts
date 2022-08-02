@@ -58,10 +58,13 @@ export async function addUser(data: any) {
 			email: data.email.toLowerCase(),
 			password: bcrypt.hashSync(data.password, 10),
 			id: auth.generateId(),
+			settings: {
+				darkMode: false,
+			},
 			// token: auth.generateUserToken(),
 		});
 
-	return new User(user);
+	return new User(await get("users", { _id: user.insertedId }));
 }
 
 /**
@@ -84,7 +87,7 @@ export async function matchUser(data: any): Promise<User | FormError> {
 }
 
 /**
- * Returns a document in a given
+ * Returns a document in a given collection with a given filter
  */
 export async function get(collection: string, filter: object) {
 	const coll = await getCollection(collection);

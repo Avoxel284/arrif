@@ -36,15 +36,27 @@ const cms_json_1 = __importDefault(require("../cms.json"));
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const db = __importStar(require("./db"));
+const util = __importStar(require("./util"));
 const auth_1 = require("./auth");
 const router = express_1.default.Router();
+router.use((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b, _c;
+    const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a["arrif-session"]) && (0, auth_1.verifyAuthToken)((_b = req.cookies) === null || _b === void 0 ? void 0 : _b["arrif-session"]);
+    if (token && (token === null || token === void 0 ? void 0 : token.id))
+        res.locals.user = yield db.get("users", { id: token.id });
+    res.locals.meta = cms_json_1.default;
+    res.locals.path = req.path;
+    res.locals.sessionToken = (_c = req.cookies) === null || _c === void 0 ? void 0 : _c["arrif-session"];
+    res.locals.debugMenu = process.env.NODE_ENV != "PRODUCTION";
+    next();
+}));
 /** Root */
 router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.render("index", { meta: cms_json_1.default, path: req.path });
+    res.render("index");
 }));
 /** Login */
 router.get("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    res.render("onboarding", { meta: cms_json_1.default, path: req.path, formType: "login" });
+    res.render("onboarding", { formType: "login" });
 }));
 router.post("/auth", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.headers["content-type"] !== "application/json")
@@ -55,19 +67,19 @@ router.post("/auth", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     const user = yield db.matchUser(req.body);
     if (user instanceof classes_1.FormError)
         return res.status(400).send(user);
+    res.cookie("arrif-session", (0, auth_1.generateAuthToken)(user.id));
     if (req.query.callback)
         return res.redirect(req.query.callback);
     res.sendStatus(200);
 }));
 /** Logout */
 router.get("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie("arrif-session");
     res.redirect("/");
 }));
 /** Register */
 router.get("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.render("onboarding", {
-        meta: cms_json_1.default,
-        path: req.path,
         formType: "register",
     });
 }));
@@ -80,36 +92,74 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
     const checkDupAcc = yield db.checkDupAcc(req.body);
     if (checkDupAcc instanceof classes_1.FormError)
         return res.status(400).send(checkDupAcc);
-    db.addUser(req.body);
-    res.cookie("arrif-session", "session");
+    const user = yield db.addUser(req.body);
+    res.cookie("arrif-session", (0, auth_1.generateAuthToken)(user.id));
     return res.redirect("/dashboard");
     // res.send(`${req.body.username}:${req.body.password}:${req.body.email}`);
 }));
 /** Dashboard */
 router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const token = req.headers["authorization"] && (0, auth_1.verifyAuthToken)(req.headers["authorization"]);
+    var _d, _e;
+    const token = ((_d = req.cookies) === null || _d === void 0 ? void 0 : _d["arrif-session"]) && (0, auth_1.verifyAuthToken)((_e = req.cookies) === null || _e === void 0 ? void 0 : _e["arrif-session"]);
     if (!token || !(token === null || token === void 0 ? void 0 : token.id))
-        return res
-            .status(401)
-            .render("error", { err: "401 Unauthorized", msg: "Trying to forge JWTs now huh?" });
+        return res.redirect("/login");
     const user = yield db.get("users", { id: token.id });
     if (!user)
-        res.redirect("/");
-    // const token = authenticateToken(req, res);
-    // if (!token) return res.sendStatus(403);
-    res.render("dashboard", { meta: cms_json_1.default, user: user, path: req.path });
+        return res.redirect("/");
+    const hours = new Date().getHours();
+    let welcomeText = "Morning";
+    if (hours > 12 && hours < 18)
+        welcomeText = "Afternoon";
+    else if (hours > 18)
+        welcomeText = "Evening";
+    let schedule = {
+        upnext: [
+            {
+                name: "English",
+                desc: "With Mr Chen in D6",
+                time: "8:55am",
+                footer: "from Week A timetable",
+            },
+            {
+                name: "Math",
+                desc: "With Mr Chen in D6",
+                time: "10:00am",
+                footer: "from Week A timetable",
+            },
+            {
+                name: "Recess",
+                desc: "-",
+                time: "11:05am",
+                footer: "from Week A timetable",
+            },
+        ],
+    };
+    res.render("dashboard", { welcomeText: welcomeText, schedule: schedule });
 }));
 /** Settings */
 router.get("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    let m = cms_json_1.default;
-    let user = {
-        username: "username",
-    };
-    res.render("settings", { meta: m, user: user, path: req.path });
+    res.render("settings", {
+        settings: [
+            {
+                l: "Username",
+                t: "text",
+                n: "username",
+            },
+            {
+                l: "Password",
+                t: "password",
+                n: "password",
+            },
+            {
+                l: "Username",
+                t: "text",
+                n: "username",
+            },
+        ],
+    });
 }));
 router.put("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const user = yield db.get("users", { _id: new mongodb_1.ObjectId(req.body.userId) });
-    console.log(req.body.userId);
     if (!user)
         return res.status(401).send("Could not find requested user");
     db.updateField("users", { _id: user._id }, { settings: { "": "auughhh" } });
@@ -125,7 +175,7 @@ router.get("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, fun
                 err: "404",
                 msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
             });
-        const p = (d) => `<td class="timetable-event">
+        const e = (d) => `<td class="timetable-event">
 			<span contenteditable class="timetable-event-title">${d.name}</span>
 			<span contenteditable class="timetable-event-loc">${d.loc}</span><br>
 			<span contenteditable class="timetable-event-desc">${d.desc}</span>
@@ -133,33 +183,31 @@ router.get("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, fun
         const days = Object.entries(timetable.days);
         const numPeriods = days[0][1].length;
         const rows = [];
+        // days.map((d)=>{
+        // })
         for (let i = 0; i < numPeriods; i++)
-            rows.push(`<td class="timetable-period">${i}</td>` + days.map((d) => p(d[1][i])).join(""));
+            rows.push(`<td class="timetable-period">${i}</td>` + days.map((d) => e(d[1][i])).join(""));
         res.render("timetable", {
-            meta: cms_json_1.default,
             tt: Object.assign(Object.assign({}, timetable), { html: {
                     rows: rows.map((d) => `<tr>${d}</tr>`).join(""),
                     days: days.map((d) => `<th>${d[0]}</th>`).join(""),
                 } }),
             path: req.path,
         });
+        // const firstRow =
     }
     else {
         const timetable = {
-            id: (0, auth_1.generateId)(),
+            id: (0, auth_1.generateId)("num"),
             name: "New Timetable",
             repeats: 1,
-            days: {
-                Monday: [],
-                Tuesday: [],
-                Wednesday: [],
-                Thursday: [],
-                Friday: [],
-                Saturday: [],
+            days: [],
+            html: {
+                rows: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                headers: ["Day", ...util.genArrayFromRange(0, 6)],
             },
-            html: {},
         };
-        res.render("timetable", { meta: cms_json_1.default, path: req.path, tt: timetable });
+        res.render("timetable", { tt: timetable });
     }
 }));
 exports.default = router;
