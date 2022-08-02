@@ -4,6 +4,7 @@ import { FormError, User } from "./classes";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import bcrypt from "bcrypt";
 import meta from "../cms.json";
+import * as jwt from "jsonwebtoken";
 
 const client = new MongoClient(
 	`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`
@@ -44,41 +45,28 @@ export async function checkDupAcc(data: any) {
 	return;
 }
 
-/**
- * Encrypt given login data and return it
- */
-export async function encryptLoginData(data: any) {
-	const hash = await bcrypt.hash(data.password, 11).catch((err: Error) => {
-		throw err;
-	});
-	data.password = hash;
-
-	return {
-		username: data.username,
-		password: data.password,
-	};
-}
-
 /*
  */
 export async function addUser(data: any) {
-	const hash = await bcrypt.hash(data.password, 10).catch((err: Error) => {
-		throw err;
-	});
-	data.password = hash;
+	const user = await (
+		await client
+	)
+		.db("db0")
+		.collection("users")
+		.insertOne({
+			username: data.username.toLowerCase(),
+			email: data.email.toLowerCase(),
+			password: bcrypt.hashSync(data.password, 10),
+		});
 
-	(await client).db("db0").collection("users").insertOne({
-		username: data.username.toLowerCase(),
-		email: data.email.toLowerCase(),
-		password: data.password,
-	});
+	return new User(user);
 }
 
 /**
  * Compare given login data to given hash from DB and return boolean if authorized or not
  */
 export async function retrieveUser(data: any) {
-	const users = (await client).db("db0").collection("users");
+	const users = await getCollection("users");
 
 	const user = await users.findOne({
 		$or: [{ username: data.username }, { email: data.email }],
@@ -90,5 +78,14 @@ export async function retrieveUser(data: any) {
 	});
 	if (!match) return new FormError("Incorrect password", ["password"]);
 
-	return new User();
+	return new User(user);
+}
+
+export async function retrieveUserTimetables(ownerId: string) {
+	const timetables = await (
+		await getCollection("timetables")
+	).findOne({
+		ownerId: ownerId,
+	});
+	return timetables;
 }

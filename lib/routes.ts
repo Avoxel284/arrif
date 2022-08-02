@@ -3,6 +3,7 @@ import meta from "../cms.json";
 import { FormError } from "./classes";
 import * as db from "./db";
 import * as util from "./util";
+import * as jwt from "jsonwebtoken"
 
 const router = express.Router();
 
@@ -23,10 +24,19 @@ router.post("/login", async (req, res) => {
 	const checkFormData = await db.checkFormData(req.body, "login");
 	if (checkFormData) return res.status(400).send(checkFormData);
 
-	const getUser = await db.retrieveUser(req.body);
-	if (getUser instanceof FormError) return res.status(400).send(getUser);
+	const user = await db.retrieveUser(req.body);
+	if (user instanceof FormError) return res.status(400).send(user);
 
 	// res.sendStatus(200);
+	console.log(user.id);
+	console.log(await db.retrieveUserTimetables(user.id));
+
+	const jwtoken = jwt.sign({ id: user.id }, `${process.env.AUTH_TOKEN}`, {
+        expiresIn: "7d", // 24 hours
+      });
+	res.cookie("arrif-session", jwtoken)
+	
+
 	res.redirect("/dashboard");
 });
 
@@ -79,6 +89,11 @@ router.get("/settings", async (req, res) => {
 		username: "username",
 	};
 	res.render("settings", { meta: m, user: user, path: req.path });
+});
+
+/** Timetables */
+router.get("/timetables", async (req, res) => {
+	
 });
 
 export default router;

@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retrieveUser = exports.addUser = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
+exports.retrieveUserTimetables = exports.retrieveUser = exports.addUser = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -99,7 +99,7 @@ exports.addUser = addUser;
  */
 function retrieveUser(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const users = (yield client).db("db0").collection("users");
+        const users = yield getCollection("users");
         const user = yield users.findOne({
             $or: [{ username: data.username }, { email: data.email }],
         });
@@ -110,7 +110,16 @@ function retrieveUser(data) {
         });
         if (!match)
             return new classes_1.FormError("Incorrect password", ["password"]);
-        return new classes_1.User();
+        return new classes_1.User(user);
     });
 }
 exports.retrieveUser = retrieveUser;
+function retrieveUserTimetables(ownerId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const timetables = yield (yield getCollection("timetables")).findOne({
+            ownerId: ownerId,
+        });
+        return timetables;
+    });
+}
+exports.retrieveUserTimetables = retrieveUserTimetables;

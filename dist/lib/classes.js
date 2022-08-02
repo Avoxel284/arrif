@@ -6,6 +6,7 @@ class User {
         this.username = data.username;
         this.password = data.password;
         this.email = data.email;
+        this.id = data._id;
     }
 }
 exports.User = User;

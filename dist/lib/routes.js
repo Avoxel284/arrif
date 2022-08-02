@@ -54,10 +54,12 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const checkFormData = yield db.checkFormData(req.body, "login");
     if (checkFormData)
         return res.status(400).send(checkFormData);
-    const getUser = yield db.retrieveUser(req.body);
-    if (getUser instanceof classes_1.FormError)
-        return res.status(400).send(getUser);
+    const user = yield db.retrieveUser(req.body);
+    if (user instanceof classes_1.FormError)
+        return res.status(400).send(user);
     // res.sendStatus(200);
+    console.log(user.id);
+    console.log(yield db.retrieveUserTimetables(user.id));
     res.redirect("/dashboard");
 }));
 /** Logout */
