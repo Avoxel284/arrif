@@ -1,5 +1,6 @@
 import express from "express";
 import meta from "../cms.json";
+import { FormError } from "./classes";
 import * as db from "./db";
 import * as util from "./util";
 
@@ -21,6 +22,9 @@ router.post("/login", async (req, res) => {
 
 	const checkFormData = await db.checkFormData(req.body, "login");
 	if (checkFormData) return res.status(400).send(checkFormData);
+
+	const getUser = await db.retrieveUser(req.body);
+	if (getUser instanceof FormError) return res.status(400).send(getUser);
 
 	// res.sendStatus(200);
 	res.redirect("/dashboard");
@@ -52,6 +56,8 @@ router.post("/register", async (req, res) => {
 	const checkDupAcc = await db.checkDupAcc(req.body);
 	if (checkDupAcc) return res.status(400).send(checkDupAcc);
 
+	db.addUser(req.body);
+	res.cookie("arrif-session", "session");
 	return res.redirect("/dashboard");
 
 	// res.send(`${req.body.username}:${req.body.password}:${req.body.email}`);

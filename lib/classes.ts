@@ -12,3 +12,12 @@ export class User {
 		this.email = data.email;
 	}
 }
+
+export class FormError {
+	msg: string;
+	fields: string[];
+	constructor(msg: string, fields: string[]) {
+		this.msg = msg;
+		this.fields = fields;
+	}
+}

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.User = void 0;
+exports.FormError = exports.User = void 0;
 class User {
     constructor(data = {}) {
         this.username = data.username;
@@ -9,3 +9,10 @@ class User {
     }
 }
 exports.User = User;
+class FormError {
+    constructor(msg, fields) {
+        this.msg = msg;
+        this.fields = fields;
+    }
+}
+exports.FormError = FormError;

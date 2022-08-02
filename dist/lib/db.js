@@ -13,12 +13,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.authorizeLoginData = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = void 0;
+exports.retrieveUser = exports.addUser = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
+const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cms_json_1 = __importDefault(require("../cms.json"));
 const client = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
-exports.default = (await client).db("db0");
+function getCollection(col) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return (yield client).db("db0").collection(col);
+    });
+}
+exports.getCollection = getCollection;
+//https://www.bezkoder.com/node-js-express-login-mongodb/
 function checkFormData(data, formType) {
     return __awaiter(this, void 0, void 0, function* () {
         const nullFields = [];
@@ -40,8 +47,8 @@ function checkFormData(data, formType) {
 exports.checkFormData = checkFormData;
 function checkDupAcc(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const users = (yield client).db("db0").collection("users");
-        yield users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
+        const users = yield getCollection("users");
+        // await users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
         const dupUser = yield users.findOne({
             $or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
         });
@@ -71,15 +78,39 @@ function encryptLoginData(data) {
     });
 }
 exports.encryptLoginData = encryptLoginData;
+/*
+ */
+function addUser(data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const hash = yield bcrypt_1.default.hash(data.password, 10).catch((err) => {
+            throw err;
+        });
+        data.password = hash;
+        (yield client).db("db0").collection("users").insertOne({
+            username: data.username.toLowerCase(),
+            email: data.email.toLowerCase(),
+            password: data.password,
+        });
+    });
+}
+exports.addUser = addUser;
 /**
  * Compare given login data to given hash from DB and return boolean if authorized or not
  */
-function authorizeLoginData(data, hash) {
+function retrieveUser(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const match = yield bcrypt_1.default.compare(data.password, hash).catch((err) => {
+        const users = (yield client).db("db0").collection("users");
+        const user = yield users.findOne({
+            $or: [{ username: data.username }, { email: data.email }],
+        });
+        if (!user)
+            return new classes_1.FormError("User does not exist", ["username"]);
+        const match = yield bcrypt_1.default.compare(data.password, user.password).catch((err) => {
             throw err;
         });
-        return match;
+        if (!match)
+            return new classes_1.FormError("Incorrect password", ["password"]);
+        return new classes_1.User();
     });
 }
-exports.authorizeLoginData = authorizeLoginData;
+exports.retrieveUser = retrieveUser;

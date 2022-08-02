@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -33,6 +37,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cms_json_1 = __importDefault(require("../cms.json"));
+const classes_1 = require("./classes");
 const db = __importStar(require("./db"));
 const router = express_1.default.Router();
 /** Root */
@@ -49,6 +54,9 @@ router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const checkFormData = yield db.checkFormData(req.body, "login");
     if (checkFormData)
         return res.status(400).send(checkFormData);
+    const getUser = yield db.retrieveUser(req.body);
+    if (getUser instanceof classes_1.FormError)
+        return res.status(400).send(getUser);
     // res.sendStatus(200);
     res.redirect("/dashboard");
 }));
@@ -74,6 +82,8 @@ router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, functio
     const checkDupAcc = yield db.checkDupAcc(req.body);
     if (checkDupAcc)
         return res.status(400).send(checkDupAcc);
+    db.addUser(req.body);
+    res.cookie("arrif-session", "session");
     return res.redirect("/dashboard");
     // res.send(`${req.body.username}:${req.body.password}:${req.body.email}`);
 }));
