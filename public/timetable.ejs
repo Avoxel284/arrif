@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" href="/imgs/IconColour.png">
+	<title>Timetable - Arrif</title>
+
+	<link rel="stylesheet" href="/style/base.css">
+	<link rel="stylesheet" href="/style/mediaoverride.css">
+	<link rel="stylesheet" href="/style/timetable.css">
+</head>
+
+<body>
+	<%- include("templates/navbar") %>
+
+	<section class="responsive-flex">
+		<div class="responsive-container">
+			<div>
+				<h1 style="margin-right:0; display:inline-block"><%= tt.title %></h1>
+				<button class="timetable-button" style="float: right; vertical-align: middle;">Update</button>
+			</div>
+
+			<table class="timetable">
+				<tr>
+					<th class="timetable-period" style="width: 30px">Period</th>
+					<%- tt.html.days %>
+				</tr>
+				<%- tt.html.rows %>
+			</table>
+		</div>
+	</section>
+
+	<%- include("templates/footer.ejs"); %>
+
+	<script src="timetable.js"></script>
+</body>
+
+</html>

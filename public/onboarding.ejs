@@ -4,11 +4,11 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="imgs/IconColour.png">
+	<link rel="icon" href="/imgs/IconColour.png">
 	<title><%= meta.forms[locals.formType].t %> - Arrif</title>
 
-	<link rel="stylesheet" href="style/base.css">
-	<link rel="stylesheet" href="style/forms.css">
+	<link rel="stylesheet" href="/style/base.css">
+	<link rel="stylesheet" href="/style/forms.css">
 </head>
 
 <body>
@@ -40,7 +40,7 @@
 				if (["text", "password"].includes(e.getAttribute("type"))) data[e.getAttribute("name")] = e.value;
 			});
 			headers.append("Content-Type", "application/json");
-			return await fetch(window.location.href, {
+			return await fetch("<%= meta.forms[locals.formType].a %>", {
 				body: JSON.stringify(data),
 				headers: headers,
 				method: "POST",
@@ -50,12 +50,12 @@
 				if (res.fields && res.msg) {
 					inputs.forEach((i) => {
 						if (res.fields.includes(i.getAttribute("name"))) i.style.borderColor = "red";
-						else i.style.borderColor = "unset";
+						else i.style.borderColor = "white";
 					})
 					document.querySelector("#form #form-error").style.display = "block";
 					document.querySelector("#form #form-error #form-error-msg").textContent = res.msg;
 				} else {
-					window.location = res.url
+					window.location.pathname = "dashboard"
 				}
 			})
 		}

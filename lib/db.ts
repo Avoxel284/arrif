@@ -1,10 +1,11 @@
 // Avoxel284
 
 import { FormError, User } from "./classes";
-import { MongoClient, ServerApiVersion } from "mongodb";
+import { Collection, MongoClient, ReturnDocument, ServerApiVersion } from "mongodb";
 import bcrypt from "bcrypt";
 import meta from "../cms.json";
 import * as jwt from "jsonwebtoken";
+import * as auth from "./auth";
 
 const client = new MongoClient(
 	`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`
@@ -13,7 +14,6 @@ const client = new MongoClient(
 export async function getCollection(col: string) {
 	return (await client).db("db0").collection(col);
 }
-//https://www.bezkoder.com/node-js-express-login-mongodb/
 
 export async function checkFormData(data: any, formType: "register" | "login") {
 	const nullFields: any[] = [];
@@ -57,15 +57,17 @@ export async function addUser(data: any) {
 			username: data.username.toLowerCase(),
 			email: data.email.toLowerCase(),
 			password: bcrypt.hashSync(data.password, 10),
+			id: auth.generateId(),
+			// token: auth.generateUserToken(),
 		});
 
 	return new User(user);
 }
 
 /**
- * Compare given login data to given hash from DB and return boolean if authorized or not
+ * Compare given login data and return User from DB or formError if authorized or not
  */
-export async function retrieveUser(data: any) {
+export async function matchUser(data: any): Promise<User | FormError> {
 	const users = await getCollection("users");
 
 	const user = await users.findOne({
@@ -79,6 +81,19 @@ export async function retrieveUser(data: any) {
 	if (!match) return new FormError("Incorrect password", ["password"]);
 
 	return new User(user);
+}
+
+/**
+ * Returns a document in a given
+ */
+export async function get(collection: string, filter: object) {
+	const coll = await getCollection(collection);
+	return await coll.findOne(filter);
+}
+
+export async function updateField(collection: string, filter: any, values: any) {
+	const coll = await getCollection(collection);
+	coll.updateOne(filter, { $set: values });
 }
 
 export async function retrieveUserTimetables(ownerId: string) {

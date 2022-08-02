@@ -12,3 +12,11 @@ function arrayRm(arr, index) {
     return arr;
 }
 exports.arrayRm = arrayRm;
+/**
+ * Returns a given string that has been truncated to a given length
+ */
+exports.truncateString = (str, len) => {
+    if (str == null)
+        return null;
+    return str.substr(0, length) + "...";
+};

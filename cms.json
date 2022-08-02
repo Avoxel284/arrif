@@ -11,6 +11,7 @@
 	"forms": {
 		"login": {
 			"t": "Login",
+			"a": "/auth",
 			"f": [
 				{ "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
 				{ "n": "password", "t": "password" }
@@ -18,6 +19,7 @@
 		},
 		"register": {
 			"t": "Sign up",
+			"a": "/register",
 			"f": [
 				{ "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
 				{ "n": "email", "t": "text", "p": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$" },

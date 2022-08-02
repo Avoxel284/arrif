@@ -17,6 +17,7 @@ app.set("views", path_1.default.join(__dirname, "..", "public"));
 app.use(express_1.default.static(path_1.default.join(__dirname, "..", "public", "static")));
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
+// app.use(authenticateToken);
 app.use("/", routes_1.default);
 app.listen(80, () => {
     console.log(`ARRIF BACKEND LISTENING :: PORT 80`);
@@ -24,8 +25,10 @@ app.listen(80, () => {
 app.use((err, req, res, next) => {
     // thx express for not including this one in the typings
     console.error(err);
-    res.status(500).render("error", { errorMsg: "An internal error occurred" });
+    res.status(500).render("error", { err: "500", msg: "An internal error occurred..." });
 });
 app.use(function (req, res, next) {
-    res.status(404).render("error", { errorMsg: "404 Not Found" });
+    res
+        .status(404)
+        .render("error", { err: "404", msg: "Couldn't find whatever you're looking for..." });
 });

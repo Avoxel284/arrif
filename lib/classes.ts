@@ -7,12 +7,13 @@ export class User {
 	email: string;
 	/** User Id, same as document id */
 	id: string;
+	/** User's token - password but more dangerous. Encoded in Base64*/
+	token: string;
 	/** Settings */
 	settings: {
 		/** Super dark mode theme */
-		darkMode: boolean,
-
-	}
+		darkMode: boolean;
+	};
 
 	constructor(data: any = {}) {
 		this.username = data.username;
@@ -20,6 +21,7 @@ export class User {
 		this.email = data.email;
 		this.settings = data.settings;
 		this.id = data._id;
+		this.token = data.token;
 	}
 }
 

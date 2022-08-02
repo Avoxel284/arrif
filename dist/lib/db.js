@@ -1,5 +1,24 @@
 "use strict";
 // Avoxel284
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,11 +32,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retrieveUserTimetables = exports.retrieveUser = exports.addUser = exports.encryptLoginData = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
+exports.retrieveUserTimetables = exports.updateField = exports.get = exports.matchUser = exports.addUser = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const cms_json_1 = __importDefault(require("../cms.json"));
+const auth = __importStar(require("./auth"));
 const client = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
 function getCollection(col) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -25,7 +45,6 @@ function getCollection(col) {
     });
 }
 exports.getCollection = getCollection;
-//https://www.bezkoder.com/node-js-express-login-mongodb/
 function checkFormData(data, formType) {
     return __awaiter(this, void 0, void 0, function* () {
         const nullFields = [];
@@ -62,42 +81,28 @@ function checkDupAcc(data) {
     });
 }
 exports.checkDupAcc = checkDupAcc;
-/**
- * Encrypt given login data and return it
- */
-function encryptLoginData(data) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const hash = yield bcrypt_1.default.hash(data.password, 11).catch((err) => {
-            throw err;
-        });
-        data.password = hash;
-        return {
-            username: data.username,
-            password: data.password,
-        };
-    });
-}
-exports.encryptLoginData = encryptLoginData;
 /*
  */
 function addUser(data) {
     return __awaiter(this, void 0, void 0, function* () {
-        const hash = yield bcrypt_1.default.hash(data.password, 10).catch((err) => {
-            throw err;
-        });
-        data.password = hash;
-        (yield client).db("db0").collection("users").insertOne({
+        const user = yield (yield client)
+            .db("db0")
+            .collection("users")
+            .insertOne({
             username: data.username.toLowerCase(),
             email: data.email.toLowerCase(),
-            password: data.password,
+            password: bcrypt_1.default.hashSync(data.password, 10),
+            id: auth.generateId(),
+            // token: auth.generateUserToken(),
         });
+        return new classes_1.User(user);
     });
 }
 exports.addUser = addUser;
 /**
- * Compare given login data to given hash from DB and return boolean if authorized or not
+ * Compare given login data and return User from DB or formError if authorized or not
  */
-function retrieveUser(data) {
+function matchUser(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield getCollection("users");
         const user = yield users.findOne({
@@ -113,7 +118,24 @@ function retrieveUser(data) {
         return new classes_1.User(user);
     });
 }
-exports.retrieveUser = retrieveUser;
+exports.matchUser = matchUser;
+/**
+ * Returns a document in a given
+ */
+function get(collection, filter) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const coll = yield getCollection(collection);
+        return yield coll.findOne(filter);
+    });
+}
+exports.get = get;
+function updateField(collection, filter, values) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const coll = yield getCollection(collection);
+        coll.updateOne(filter, { $set: values });
+    });
+}
+exports.updateField = updateField;
 function retrieveUserTimetables(ownerId) {
     return __awaiter(this, void 0, void 0, function* () {
         const timetables = yield (yield getCollection("timetables")).findOne({

@@ -1,0 +1,71 @@
+.timetable {
+	width: 100%;
+	color: white;
+	border: solid 1px white;
+	border-radius: 5px;
+	padding: 10px;
+	font-family: "elza-text";
+	text-align: center;
+	border-collapse: separate;
+	border-spacing: 6px;
+}
+
+.timetable tr {
+	width: 10px;
+}
+
+.timetable-event {
+	padding: 7px;
+	color: white;
+	border: solid 1px white;
+	border-radius: 5px;
+	min-width: 30px;
+}
+
+.timetable-event-title {
+	float: left;
+	font-weight: bold;
+	/* font-size: 22px; */
+}
+
+.timetable-event-loc {
+	float: right;
+	opacity: 0.8;
+}
+
+.timetable-event-desc {
+	float: left;
+	text-align: left;
+	margin-top: 4px;
+}
+
+.timetable-event * {
+	outline: none;
+}
+
+.timetable-event *:active {
+	border:red;
+}
+
+.timetable-period {
+	text-align: left;
+	font-weight: bold;
+	padding-right: 15px;
+}
+
+.timetable-button {
+	font-family: "elza-text";
+	border: 1px solid white;
+	background-color: transparent;
+	padding: 10px;
+	font-size: 1em;
+	color: white;
+	transition: all 0.1s;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+.timetable-button:hover {
+	background-color: white;
+	color: var(--accent-1);
+}

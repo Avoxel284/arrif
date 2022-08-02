@@ -3,16 +3,16 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link rel="icon" href="imgs/IconColour.png">
+	<link rel="icon" href="/imgs/IconColour.png">
 	<title>Error!!1 - Arrif</title>
 
-	<link rel="stylesheet" href="style/base.css">
+	<link rel="stylesheet" href="/style/base.css">
 </head>
 
 <body style="background-color: white;">
 	<div class="cta-center">
-		<h1 style="color:var(--accent-1);"><%= errorMsg %></h1>
-		<p style="color:black">Return <a style="color:black" href="/">home?</a></p>
+		<h1 style="color:var(--accent-1);"><%= locals.err %></h1>
+		<p style="color:black; line-height: 20px;"><%- locals?.msg ? msg + "<br>" : "" %>Return <a style="color:black" href="/">home?</a></p>
 	</div>
 </body>
 

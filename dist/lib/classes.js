@@ -6,7 +6,9 @@ class User {
         this.username = data.username;
         this.password = data.password;
         this.email = data.email;
+        this.settings = data.settings;
         this.id = data._id;
+        this.token = data.token;
     }
 }
 exports.User = User;
