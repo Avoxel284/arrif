@@ -12,6 +12,8 @@ export class User {
 		/** Super dark mode theme */
 		darkMode: boolean;
 	};
+	/** Array of the IDs of the user's timetables */
+	timetables: number[];
 
 	constructor(data: any = {}) {
 		this.username = data.username;
@@ -19,6 +21,7 @@ export class User {
 		this.email = data.email;
 		this.settings = data.settings;
 		this.id = data.id;
+		this.timetables = data.timetables;
 	}
 }
 

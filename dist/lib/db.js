@@ -2,7 +2,11 @@
 // Avoxel284
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -32,7 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retrieveUserTimetables = exports.updateField = exports.get = exports.matchUser = exports.addUser = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
+exports.retrieveUserTimetables = exports.updateField = exports.getMultiple = exports.get = exports.matchUser = exports.addUser = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -96,6 +100,7 @@ function addUser(data) {
             settings: {
                 darkMode: false,
             },
+            timetables: [],
             // token: auth.generateUserToken(),
         });
         return new classes_1.User(yield get("users", { _id: user.insertedId }));
@@ -132,6 +137,16 @@ function get(collection, filter) {
     });
 }
 exports.get = get;
+/**
+ * Returns multiple document in a given collection with a given filter
+ */
+function getMultiple(collection, filter) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const coll = yield getCollection(collection);
+        return yield coll.find(filter);
+    });
+}
+exports.getMultiple = getMultiple;
 function updateField(collection, filter, values) {
     return __awaiter(this, void 0, void 0, function* () {
         const coll = yield getCollection(collection);

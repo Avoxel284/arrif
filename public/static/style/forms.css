@@ -30,6 +30,7 @@ form input[type="button"] {
 	cursor: pointer;
 	transition: all 0.1s;
 	flex: 1;
+	margin-top: 5px;
 }
 
 form input[type="submit"]:hover,
@@ -38,14 +39,14 @@ form input[type="button"]:hover {
 	color: var(--accent-1);
 }
 
-form label {
+form .form-label {
 	color: white;
 	font-family: "elza-text";
 	position: relative;
 	width: max-content;
 }
 
-form label span {
+form .form-label span {
 	position: absolute;
 	top: 5px;
 	left: 16px;
@@ -53,6 +54,7 @@ form label span {
 	background-color: var(--accent-1);
 	width: inherit;
 	word-wrap: normal;
+	/* line-height: 10px; */
 }
 
 #form-error {
@@ -75,7 +77,6 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-	-webkit-box-shadow: 0 0 0 30px var(--accent-1) inset !important;
+	-webkit-box-shadow: 0 0 0 50px var(--accent-1) inset !important;
 	-webkit-text-fill-color: white !important;
-	-webkit-text-size-adjust: none !important;
 }

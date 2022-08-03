@@ -13,8 +13,8 @@
             "t": "Login",
             "a": "/auth",
             "f": [
-                { "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
-                { "n": "password", "t": "password" }
+                { "l": "Your username", "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
+                { "l": "Your password", "n": "password", "t": "password" }
             ]
         },
         "register": {
@@ -33,12 +33,6 @@
                     "n": "password",
                     "t": "password"
                 }
-            ]
-        },
-        "settings": {
-            "f": [
-                { "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
-                { "n": "password", "t": "password" }
             ]
         }
     },
@@ -63,6 +57,10 @@
                 }
             ],
             [
+                {
+                    "u": "/timetable/",
+                    "n": "My timetables"
+                },
                 {
                     "u": "/dashboard",
                     "n": "Dashboard"

@@ -19,9 +19,9 @@
 			<h1>Settings</h1>
 			<form class="" method="dialog" autocomplete="off">
 				<% locals.settings.forEach(v => { %>
-				<label>
+				<div class="form-label">
 					<span><%= v.l %></span>
-				</label>
+				</div>
 				<input type="<%= v.t %>" name="<%= v.n %>" autocomplete="off">
 				<% }) %>
 				<input type="submit" value="update">

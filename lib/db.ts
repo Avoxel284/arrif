@@ -61,6 +61,7 @@ export async function addUser(data: any) {
 			settings: {
 				darkMode: false,
 			},
+			timetables: [],
 			// token: auth.generateUserToken(),
 		});
 
@@ -92,6 +93,14 @@ export async function matchUser(data: any): Promise<User | FormError> {
 export async function get(collection: string, filter: object) {
 	const coll = await getCollection(collection);
 	return await coll.findOne(filter);
+}
+
+/**
+ * Returns multiple document in a given collection with a given filter
+ */
+export async function getMultiple(collection: string, filter: object) {
+	const coll = await getCollection(collection);
+	return await coll.find(filter);
 }
 
 export async function updateField(collection: string, filter: any, values: any) {

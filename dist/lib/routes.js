@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -112,27 +116,26 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
         welcomeText = "Afternoon";
     else if (hours > 18)
         welcomeText = "Evening";
+    const tt = yield db.getMultiple("timetables", { ownerId: user.id });
+    const upnext = [];
+    tt.forEach((t) => {
+        console.log(t);
+        t.days["Monday"].map((d) => {
+            console.log("d", d);
+            upnext.push({
+                name: d.name,
+                desc: `With ${d.desc} in ${d.loc}`,
+                time: `${d.dur}:${d.dur}am`,
+                footer: `from ${t.id}`,
+            });
+        });
+    });
+    for (const t in tt) {
+        // for (const  t.days["Monday"])
+    }
+    console.log("---", upnext);
     let schedule = {
-        upnext: [
-            {
-                name: "English",
-                desc: "With Mr Chen in D6",
-                time: "8:55am",
-                footer: "from Week A timetable",
-            },
-            {
-                name: "Math",
-                desc: "With Mr Chen in D6",
-                time: "10:00am",
-                footer: "from Week A timetable",
-            },
-            {
-                name: "Recess",
-                desc: "-",
-                time: "11:05am",
-                footer: "from Week A timetable",
-            },
-        ],
+        upnext: upnext,
     };
     res.render("dashboard", { welcomeText: welcomeText, schedule: schedule });
 }));
@@ -146,14 +149,14 @@ router.get("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function
                 n: "username",
             },
             {
+                l: "Email",
+                t: "email",
+                n: "email",
+            },
+            {
                 l: "Password",
                 t: "password",
                 n: "password",
-            },
-            {
-                l: "Username",
-                t: "text",
-                n: "username",
             },
         ],
     });
@@ -210,4 +213,53 @@ router.get("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, fun
         res.render("timetable", { tt: timetable });
     }
 }));
+// /** Timetable event */
+// router.get("/timetable/:id/:eid", async (req, res) => {
+// 	const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+// 	if (req.params.id != "new") {
+// 		const timetable = await db.get("timetables", { id: req.params.id });
+// 		if (!timetable)
+// 			return res.status(404).render("error", {
+// 				err: "404",
+// 				msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
+// 			});
+// 		const e = (d: any) => `<td class="timetable-event">
+// 			<span contenteditable class="timetable-event-title">${d.name}</span>
+// 			<span contenteditable class="timetable-event-loc">${d.loc}</span><br>
+// 			<span contenteditable class="timetable-event-desc">${d.desc}</span>
+// 		</td>`;
+// 		const days: any = Object.entries(timetable.days);
+// 		const numPeriods = days[0][1].length;
+// 		const rows: any = [];
+// 		// days.map((d)=>{
+// 		// })
+// 		for (let i = 0; i < numPeriods; i++)
+// 			rows.push(
+// 				`<td class="timetable-period">${i}</td>` + days.map((d: any) => e(d[1][i])).join("")
+// 			);
+// 		res.render("timetable", {
+// 			tt: {
+// 				...timetable,
+// 				html: {
+// 					rows: rows.map((d: any) => `<tr>${d}</tr>`).join(""),
+// 					days: days.map((d: any) => `<th>${d[0]}</th>`).join(""),
+// 				},
+// 			},
+// 			path: req.path,
+// 		});
+// 		// const firstRow =
+// 	} else {
+// 		const timetable = {
+// 			id: generateId("num"),
+// 			name: "New Timetable",
+// 			repeats: 1,
+// 			days: [],
+// 			html: {
+// 				rows: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+// 				headers: ["Day", ...util.genArrayFromRange(0, 6)],
+// 			},
+// 		};
+// 		res.render("timetable", { tt: timetable });
+// 	}
+// });
 exports.default = router;

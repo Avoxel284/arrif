@@ -8,6 +8,7 @@ class User {
         this.email = data.email;
         this.settings = data.settings;
         this.id = data.id;
+        this.timetables = data.timetables;
     }
 }
 exports.User = User;
