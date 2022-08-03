@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.FormError = exports.User = void 0;
+exports.Timetable = exports.FormError = exports.User = void 0;
 class User {
     constructor(data = {}) {
         this.username = data.username;
@@ -9,6 +9,7 @@ class User {
         this.settings = data.settings;
         this.id = data.id;
         this.timetables = data.timetables;
+        this.todo = data.todo;
     }
 }
 exports.User = User;
@@ -19,3 +20,11 @@ class FormError {
     }
 }
 exports.FormError = FormError;
+class Timetable {
+    constructor(data) {
+        this.days = data.days;
+        this.id = data.id;
+        this.ownerId = data.ownerId;
+    }
+}
+exports.Timetable = Timetable;

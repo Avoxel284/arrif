@@ -1,6 +1,6 @@
 // Avoxel284
 
-import { FormError, User } from "./classes";
+import { FormError, User, Timetable } from "./classes";
 import { Collection, MongoClient, ReturnDocument, ServerApiVersion } from "mongodb";
 import bcrypt from "bcrypt";
 import meta from "../cms.json";
@@ -13,20 +13,6 @@ const client = new MongoClient(
 
 export async function getCollection(col: string) {
 	return (await client).db("db0").collection(col);
-}
-
-export async function checkFormData(data: any, formType: "register" | "login") {
-	const nullFields: any[] = [];
-	const invalidFields: any[] = [];
-	meta.forms[formType].f.forEach((f) => {
-		if (!data[f.n]) return nullFields.push(f.n);
-		if (f.p && !new RegExp(f.p).test(data[f.n])) return invalidFields.push(f.n);
-	});
-	if (nullFields.length > 0)
-		return { msg: "Required fields are not filled out", fields: nullFields };
-	if (invalidFields.length > 0) return { msg: "Field(s) are invalid", fields: invalidFields };
-	if (data.password.length < 8)
-		return { msg: "Password must at least have 8 characters", fields: "password" };
 }
 
 export async function checkDupAcc(data: any) {
@@ -62,10 +48,55 @@ export async function addUser(data: any) {
 				darkMode: false,
 			},
 			timetables: [],
+			todo: [],
 			// token: auth.generateUserToken(),
 		});
 
 	return new User(await get("users", { _id: user.insertedId }));
+}
+
+export async function addTimetable(data: any) {
+	const user = await (
+		await client
+	)
+		.db("db0")
+		.collection("timetables")
+		.insertOne({
+			id: auth.generateId("num") as string,
+			days: [
+				{
+					n: "Monday",
+					e: [],
+				},
+				{
+					n: "Tuesday",
+					e: [],
+				},
+				{
+					n: "Wednesday",
+					e: [],
+				},
+				{
+					n: "Thursday",
+					e: [],
+				},
+				{
+					n: "Friday",
+					e: [],
+				},
+				{
+					n: "Saturday",
+					e: [],
+				},
+				{
+					n: "Sunday",
+					e: [],
+				},
+			],
+			ownerId: data.ownerId,
+		});
+
+	return new Timetable(await get("timetables", { _id: user.insertedId }));
 }
 
 /**
@@ -103,9 +134,16 @@ export async function getMultiple(collection: string, filter: object) {
 	return await coll.find(filter);
 }
 
-export async function updateField(collection: string, filter: any, values: any) {
+export async function updateFields(
+	collection: string,
+	filter: any,
+	values: any,
+	many = false,
+	updater = "$set"
+) {
 	const coll = await getCollection(collection);
-	coll.updateOne(filter, { $set: values });
+	if (many) return coll.updateMany(filter, { [updater]: values });
+	return coll.updateOne(filter, { [updater]: values });
 }
 
 export async function retrieveUserTimetables(ownerId: string) {

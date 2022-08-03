@@ -1,18 +1,97 @@
 .timetable {
 	width: 100%;
 	color: white;
-	border: solid 1px white;
-	border: none;
-	border-radius: 5px;
-	padding: 10px;
+	/* padding: 10px; */
 	font-family: "elza-text";
-	text-align: center;
-	border-collapse: collapse;
-	border-spacing: 6px;
+	position: relative;
+	display: block;
+	/* overflow-y: scroll; */
+	overflow: hidden;
+	height: calc(50px * 24 * 2);
 }
 
-.timetable tr {
-	width: 10px;
+.timetable-timeline {
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	padding-top: 50px;
+}
+
+.timetable-timeline ul {
+	list-style-type: none;
+	padding: 0;
+	margin: 0;
+}
+
+.timetable-timeline ul li {
+	position: relative;
+	height: 50px;
+	text-align: left;
+}
+
+.timetable-timeline ul li:nth-of-type(2n) span {
+	display: none;
+}
+
+.timetable-timeline ul li span {
+	color: white;
+}
+
+.timetable-timeline ul li::after {
+	content: "";
+	position: absolute;
+	bottom: 0;
+	width: calc(100% - 60px);
+	left: 60px;
+	height: 1px;
+	opacity: 0.5;
+	background-color: var(--accent-3);
+}
+
+.timetable-events {
+	margin-left: 60px;
+	position: relative;
+	z-index: 1;
+	height: 100%;
+}
+
+.timetable-events ul {
+	display: flex;
+	flex-wrap: nowrap;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+
+.timetable-day {
+	flex-basis: 0;
+	flex-grow: 1;
+	margin: 0;
+	padding: 0;
+	border-right: 1px solid white;
+	height: 100%;
+}
+
+.timetable-day:last-child {
+	border-right: none;
+}
+
+.timetable-day-header {
+	display: flex;
+	align-items: center;
+	height: 50px;
+	justify-content: center;
+	border-bottom: 1px solid var(--accent-3);
+	padding: 0;
+}
+
+.timetable-day-header span {
+	font-size: 1.2em;
+	font-weight: bolder;
 }
 
 .timetable-event {
@@ -21,52 +100,35 @@
 	border: solid 1px white;
 	border-radius: 5px;
 	min-width: 30px;
+	background-color: var(--accent-2);
+	display: flex;
+	flex-direction: column;
+	cursor: pointer;
+	overflow: hidden;
 }
 
-.timetable-event-title {
-	float: left;
+.timetable-event-name {
 	font-weight: bold;
-	/* font-size: 22px; */
+	font-size: 1.2em;
+	margin-top: 2px;
 }
 
 .timetable-event-loc {
 	float: right;
 	opacity: 0.8;
+	font-size: 0.8em;
 }
 
 .timetable-event-desc {
 	float: left;
-	text-align: left;
-	margin-top: 4px;
+	/* margin-top: 4px; */
+}
+
+.timetable-event-length {
+	float: left;
+	margin-top: 3px;
 }
 
 .timetable-event * {
 	outline: none;
-}
-
-.timetable-event *:active {
-	border: red;
-}
-
-.timetable-period {
-	text-align: left;
-	font-weight: bold;
-	padding-right: 15px;
-}
-
-.timetable-button {
-	font-family: "elza-text";
-	border: 1px solid white;
-	background-color: transparent;
-	padding: 10px;
-	font-size: 1em;
-	color: white;
-	transition: all 0.1s;
-	cursor: pointer;
-	border-radius: 5px;
-}
-
-.timetable-button:hover {
-	background-color: white;
-	color: var(--accent-1);
 }

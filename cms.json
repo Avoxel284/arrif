@@ -11,10 +11,10 @@
 	"forms": {
 		"login": {
 			"t": "Login",
-			"a": "/auth",
+			"a": "/login",
 			"f": [
-				{ "l":"Your username", "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
-				{ "l":"Your password", "n": "password", "t": "password" }
+				{ "l": "Your username", "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
+				{ "l": "Your password", "n": "password", "t": "password" }
 			]
 		},
 		"register": {
@@ -33,6 +33,20 @@
 					"n": "password",
 					"t": "password"
 				}
+			]
+		},
+		"settings": {
+			"t": "Settings",
+			"a": "/settings",
+			"f": [
+				{ "l": "New username", "n": "username", "t": "text", "p": "^[A-Za-z0-9\\_]*$" },
+				{
+					"l": "New email",
+					"n": "email",
+					"t": "email",
+					"p": "^\\w+([\\.-]?\\w+)*@\\w+([\\.-]?\\w+)*(\\.\\w{2,3})+$"
+				},
+				{ "l": "New password", "n": "password", "t": "password" }
 			]
 		}
 	},

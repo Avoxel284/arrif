@@ -2,7 +2,9 @@
 	<div class="navbar-mobilebg"></div>
 	<ul class="navbar-container">
 		<li class="navbar-logo"><img src="/<%- meta.navbar.logoUrl %>"></li>
-		<%- meta.navbar.pages[locals.user ? 1 : 0].map((p, i) => `<li class="navbar-item ${p.u == path ? "selected" : ""}"><a href="${p.u}">${p.n}</a></li>`).join("\n"); %>
+		<% meta.navbar.pages[locals.user ? 1 : 0].forEach(p => { %>
+		<li class="navbar-item <%- p.u == path ? "selected" : ""  %>"><a href="<%= p.u %>"><%= p.n %></a></li>
+		<% }) %>
 		<li class="navbar-expand" onclick="navbarExpandToggle()"><img src="/imgs/HamburgerIcon.svg"></li>
 	</ul>
 

@@ -2,6 +2,7 @@
 @import url("./fonts.css");
 @import url("./navbar.css");
 @import url("./mediaoverride.css");
+@import url("./modals.css");
 
 body {
 	margin: 0;
@@ -140,4 +141,47 @@ hr {
 .cta-button:hover {
 	background-color: white;
 	color: var(--accent-1);
+}
+
+button {
+	font-family: "elza-text";
+	border: 1px solid white;
+	background-color: transparent;
+	padding: 10px;
+	font-size: 1em;
+	color: white;
+	transition: all 0.1s;
+	cursor: pointer;
+	border-radius: 5px;
+}
+
+button:hover {
+	background-color: white;
+	color: var(--accent-1);
+}
+
+.inline-block {
+	display: inline-block;
+}
+
+*::-webkit-scrollbar {
+	width: 4px;
+}
+
+*::-webkit-scrollbar-track {
+	background: var(--accent-1);
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: white;
+	border-radius: 5px;
+	border: 0px solid white;
+}
+
+*[contenteditable="true"] {
+	outline: none;
+}
+
+*[contenteditable="true"]:focus {
+	border-bottom: 1px solid white;
 }

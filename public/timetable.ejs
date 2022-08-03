@@ -11,6 +11,8 @@
 	<link rel="stylesheet" href="/style/mediaoverride.css">
 	<link rel="stylesheet" href="/style/timetable.css">
 	<link rel="stylesheet" href="/style/forms.css">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
 </head>
 
 <body>
@@ -18,51 +20,122 @@
 
 	<section class="responsive-flex">
 		<div class="responsive-container">
-			<h1 style="margin-right:0; display:inline-block">Configuration</h1>
-
-			<form>
-				<label for="name">Name of this new timetable</label>
-				<input name="name" type="text" required value="Week A">
-
-				<label for="defaultStartTime">What time do events usually start at</label>
-				<input name="defaultStartTime" type="time" required value="9:00">
-
-				<label for="defaultEventDur">Default duration</label>
-				<input name="defaultEventDur" type="number" required value="65">
-
-				<label for="repeats">This timetable repeats every ... weeks</label>
-				<input name="repeats" type="number" required value="1">
-			</form>
-		</div>
-
-		<hr style="margin-top:50px">
-
-		<div class="responsive-container">
-			<div>
-				<h1 style="margin-right:0; display:inline-block">Timetable</h1>
-				<button class="timetable-button" style="float: right; vertical-align: middle;">Update</button>
+			<h1><%= tt.name %></h1>
+			<div style="margin-bottom: 50px;">
+				<button class="inline-block" onclick="newEvent()">New event</button>
 			</div>
 
-			<table class="timetable">
-				<!-- <tr>
-					<th class="timetable-period" style="width: 30px">Period</th>
-					
-				</tr> -->
-				<tr>
-					<%- tt.html?.headers.map((d)=>`<th>${d}</th>`).join("") %>
-				</tr>
-				<%- tt.html?.rows.map((d)=>`<td>${d}</td>`).join("") %>
+			<div class="timetable">
+				<div class="timetable-timeline">
+					<ul>
+						<% timeline.forEach(t => { %>
+						<li><span><%= t %></span></li>
+						<% }) %>
+					</ul>
+				</div>
 
-			</table>
+				<div class="timetable-events">
+					<ul>
+						<% tt.days.forEach(d => { %>
+
+						<li data-day="<%= d.n %>" class="timetable-day">
+							<div class="timetable-day-header"><span><%= d.n %></span></div>
+							<div>
+								<% d.e.forEach(e => { %>
+
+								<div draggable="true" ondrag="onDrag(event)" data-start="<%= e.s %>" data-end="<%= e.e %>" data-id="<%= e.id %>" class="timetable-event" onclick="openEvent(this)" style="top: 50px;">
+									<span class="timetable-event-name"><%= e.n %></span>
+									<span class="timetable-event-desc"><%= e.d.length > 15 ? `${e.d.substring(0, 15)}...` : e.d %></span>
+									<span class="timetable-event-loc"><%= e.l %></span>
+									<span class="timetable-event-length"><%= e.s %>-<%= e.e %></span>
+								</div>
+
+								<% }); %>
+							</div>
+						</li>
+
+						<% }) %>
+					</ul>
+				</div>
+			</div>
+
+
 		</div>
 	</section>
+
+	<div id="modal-bg">
+		<dialog id="newevent-dialog" class="modal">
+			<form method="dialog">
+				<input type="text">
+				<input type="submit">
+
+			</form>
+		</dialog>
+
+		<dialog id="editevent-dialog" class="modal">
+			<form method="dialog">
+				<input type="text">
+				<input type="submit">
+			</form>
+		</dialog>
+	</div>
 
 	<%- include("templates/footer.ejs"); %>
 	<%- include("templates/debug") %>
 
-
 	<script>
+		function minutesToTimestamp(min) {
+			let m = min % 60;
+			let h = (min - m) / 60;
+			return (h < 10 ? "0" : "") + h.toString() + ":" + (m < 10 ? "0" : "") + m.toString();
+		}
 
+		function modalController(dialog, open) {
+			document.getElementById("editevent-dialog").style.display = dialog == "edit" ? "display" : "none"
+			document.getElementById("newevent-dialog").style.display = dialog == "new" ? "display" : "none"
+			document.getElementById("modal-bg").style.display = open ? "display" : "none"
+		}
+
+		const modals = {
+			edit: document.getElementById("editevent-dialog"),
+			base: document.getElementById("editevent-dialog"),
+			new: document.getElementById("newevent-dialog")
+		}
+		const tt = JSON.stringify("<%- tt %>");
+		const days = tt.days;
+		const getDayElem = (d) => document.querySelector(`.timetable-day[data-day="${d}"]`);
+		const genEventElem = (e) => {
+			return $(
+				`<div data-start="${e.s}" data-end="${e.e}" data-id="${e.id}" class="timetable-event" onclick="openEvent(this)" style="top: 50px;">
+<span class="timetable-event-name">${e.n}</span>
+<span class="timetable-event-desc">${e.d}</span>
+<span class="timetable-event-loc">${e.l}</span>
+<span class="timetable-event-length">${e.s}-${e.e}</span>
+</div>`)[0]
+		}
+
+		/**
+		 * @param {Element} e
+		 */
+		function openEvent(e) {
+			const start = e.getAttribute("data-start");
+			const end = e.getAttribute("data-end");
+			console.log(minutesToTimestamp(start), end);
+		}
+
+		function newEvent(t) {
+			modalController("edit", true)
+			fetch(`/`)
+
+			e = genEventElem({
+				s: "au",
+				e: "e",
+				id: "feonwfmwel",
+			});
+			getDayElem("Monday").appendChild(e)
+
+
+		}
 	</script>
 </body>
 

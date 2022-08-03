@@ -9,6 +9,9 @@
 
 	<link rel="stylesheet" href="/style/base.css">
 	<link rel="stylesheet" href="/style/schedule.css">
+	<link rel="stylesheet" href="/style/forms.css">
+
+	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
 </head>
 
 <body>
@@ -17,6 +20,25 @@
 	<section class="responsive-flex">
 		<div class="responsive-container">
 			<h1><%= welcomeText %>, <%= locals?.user?.username %>!</h1>
+
+			<div class="upnext">
+				<h2>To do</h2>
+				<% schedule.todo.forEach(e => { %>
+				<div class="schedule-todo" data-id="<%= e._id %>">
+					<div>
+						<span class="schedule-todo-title" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.name %></span>
+						<span class="schedule-todo-desc" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.desc %></span>
+					</div>
+					<button class="schedule-todo-remove" onclick="removeTodo(this)" style="margin-left: auto; border: 1px solid red;">Remove</button>
+					<button class="schedule-todo-update" onclick="updateTodo(this)" type="submit" style="margin-left: 5px; display: none;">Update</button>
+				</div>
+				<% }) %>
+				<form class="slim-form" onsubmit="checkForm(this)" action="/todo?callback=/dashboard" method="post">
+					<input required type="text" name="name" placeholder="name of to do">
+					<input required type="text" name="desc" placeholder="description of to do">
+					<input type="submit" value="New to do">
+				</form>
+			</div>
 
 			<div class="upnext">
 				<h2>Up next</h2>
@@ -36,6 +58,37 @@
 
 	<%- include("templates/footer") %>
 	<%- include("templates/debug") %>
+
+	<script>
+		$(`*[contenteditable="true"]`).keypress(function(e) {
+			return e.which != 13;
+		});
+
+		function contentEditableChanged(e) {
+			$(e).parents(".schedule-todo").children(".schedule-todo-update").css("display", "block");
+		}
+
+		function updateTodo(e) {
+			const id = $(e).parent().attr("data-id");
+			const inputs = $(`.schedule-todo[id='${id}'] div span[contenteditable='true']`);
+			fetch(`/todo/${id}`, {
+				body: JSON.stringify({
+					name: inputs.get(0),
+					desc: inputs.get(1)
+				}),
+				method: "PUT",
+			})
+			$(e).css("display", "none");
+		}
+
+		function removeTodo(e) {
+			if ($(e).text() == "Remove") return $(e).text("Sure?")
+			fetch(`/todo/${$(e).parent().attr("data-id")}`, {
+				method: "DELETE"
+			})
+			$(e).parent().remove();
+		}
+	</script>
 </body>
 
 </html>

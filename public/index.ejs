@@ -67,7 +67,9 @@
 
 	<section class="main responsive-flex">
 		<div class="responsive-container">
-			<button class="cta-button section1-ctabutton" style="width: 100%;"><%= meta.ctaButtonContent["section1-PostHero"][locals.user ? 1 : 0] %></button>
+			<button onclick="window.open('<%= locals.user ? `/dashboard` : `/register` %>')" class="cta-button section1-ctabutton" style="width: 100%;">
+				<%= meta.ctaButtonContent["section1-PostHero"][locals.user ? 1 : 0] %>
+			</button>
 		</div>
 	</section>
 

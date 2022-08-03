@@ -17,12 +17,16 @@
 	<section class="responsive-flex">
 		<div class="responsive-container">
 			<h1>Settings</h1>
-			<form class="" method="dialog" autocomplete="off">
-				<% locals.settings.forEach(v => { %>
-				<div class="form-label">
-					<span><%= v.l %></span>
+			<form id="form" onsubmit="event.preventDefault(); submitSettingsForm();" autocomplete="off">
+				<div id="form-error">
+					<img src="imgs/WarningIcon.svg" style="height: 24px" />
+					<span id="form-error-msg"></span>
 				</div>
-				<input type="<%= v.t %>" name="<%= v.n %>" autocomplete="off">
+				<% locals.settings.f.forEach(v => { %>
+				<div>
+					<label class="form-label"><%= v.l %></label>
+					<input type="<%= v.t %>" name="<%= v.n %>" placeholder="<%= v?.v %>" autocomplete="off">
+				</div>
 				<% }) %>
 				<input type="submit" value="update">
 			</form>
@@ -32,6 +36,37 @@
 	<%- include("templates/footer") %>
 	<%- include("templates/debug") %>
 
+	<script>
+		async function submitSettingsForm() {
+			const data = {};
+			const headers = new Headers();
+			const inputs = await document.querySelectorAll(".credentials-form-container form div input");
+			inputs.forEach((e) => {
+				if (["text", "password", "email"].includes(e.getAttribute("type")))
+					data[e.getAttribute("name")] = e.value;
+			});
+			headers.append("Content-Type", "application/json");
+			return await fetch("/settings", {
+				body: JSON.stringify(data),
+				headers: headers,
+				method: "POST",
+				redirect: "follow",
+			}).then(async (res) => {
+				if (res.status == 400 && res.headers.get("Content-Type").startsWith("application/json"))
+					res = await res.json();
+				if (res.fields && res.msg) {
+					inputs.forEach((i) => {
+						if (res.fields.includes(i.getAttribute("name"))) i.style.borderColor = "red";
+						else i.style.borderColor = "white";
+					});
+					document.querySelector("#form #form-error").style.display = "block";
+					document.querySelector("#form #form-error #form-error-msg").textContent = res.msg;
+				} else {
+					alert("Successfully updated settings!")
+				}
+			});
+		}
+	</script>
 </body>
 
 </html>

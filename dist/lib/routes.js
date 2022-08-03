@@ -1,11 +1,7 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -38,14 +34,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const cms_json_1 = __importDefault(require("../cms.json"));
 const classes_1 = require("./classes");
-const mongodb_1 = require("mongodb");
 const db = __importStar(require("./db"));
-const util = __importStar(require("./util"));
-const auth_1 = require("./auth");
+const auth = __importStar(require("./auth"));
 const router = express_1.default.Router();
 router.use((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, _b, _c;
-    const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a["arrif-session"]) && (0, auth_1.verifyAuthToken)((_b = req.cookies) === null || _b === void 0 ? void 0 : _b["arrif-session"]);
+    const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a["arrif-session"]) && auth.verifyAuthToken((_b = req.cookies) === null || _b === void 0 ? void 0 : _b["arrif-session"]);
     if (token && (token === null || token === void 0 ? void 0 : token.id))
         res.locals.user = yield db.get("users", { id: token.id });
     res.locals.meta = cms_json_1.default;
@@ -62,19 +56,23 @@ router.get("/", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 router.get("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.render("onboarding", { formType: "login" });
 }));
-router.post("/auth", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+router.post("/login", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.headers["content-type"] !== "application/json")
         return res.status(400).send(`Invalid content type`);
-    const checkFormData = yield db.checkFormData(req.body, "login");
-    if (checkFormData instanceof classes_1.FormError)
-        return res.status(400).send(checkFormData);
-    const user = yield db.matchUser(req.body);
-    if (user instanceof classes_1.FormError)
-        return res.status(400).send(user);
-    res.cookie("arrif-session", (0, auth_1.generateAuthToken)(user.id));
+    if (!res.locals.user) {
+        const checkFormData = yield auth.checkFormData(req.body, "login");
+        if (checkFormData instanceof classes_1.FormError)
+            return res.status(400).send(checkFormData);
+        const user = yield db.matchUser(req.body);
+        if (user instanceof classes_1.FormError)
+            return res.status(400).send(user);
+        res.cookie("arrif-session", auth.generateAuthToken(user.id));
+    }
     if (req.query.callback)
         return res.redirect(req.query.callback);
-    res.sendStatus(200);
+    else
+        return res.redirect("/dashboard");
+    // res.status(200).send("Authenticated");
 }));
 /** Logout */
 router.get("/logout", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -90,38 +88,31 @@ router.get("/register", (req, res) => __awaiter(void 0, void 0, void 0, function
 router.post("/register", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     if (req.headers["content-type"] !== "application/json")
         return res.status(400).send(`Invalid content type`);
-    const checkFormData = yield db.checkFormData(req.body, "register");
+    const checkFormData = yield auth.checkFormData(req.body, "register");
     if (checkFormData instanceof classes_1.FormError)
         return res.status(400).send(checkFormData);
     const checkDupAcc = yield db.checkDupAcc(req.body);
     if (checkDupAcc instanceof classes_1.FormError)
         return res.status(400).send(checkDupAcc);
     const user = yield db.addUser(req.body);
-    res.cookie("arrif-session", (0, auth_1.generateAuthToken)(user.id));
+    res.cookie("arrif-session", auth.generateAuthToken(user.id));
     return res.redirect("/dashboard");
     // res.send(`${req.body.username}:${req.body.password}:${req.body.email}`);
 }));
 /** Dashboard */
 router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e;
-    const token = ((_d = req.cookies) === null || _d === void 0 ? void 0 : _d["arrif-session"]) && (0, auth_1.verifyAuthToken)((_e = req.cookies) === null || _e === void 0 ? void 0 : _e["arrif-session"]);
-    if (!token || !(token === null || token === void 0 ? void 0 : token.id))
+    if (!res.locals.user)
         return res.redirect("/login");
-    const user = yield db.get("users", { id: token.id });
-    if (!user)
-        return res.redirect("/");
     const hours = new Date().getHours();
     let welcomeText = "Morning";
     if (hours > 12 && hours < 18)
         welcomeText = "Afternoon";
     else if (hours > 18)
         welcomeText = "Evening";
-    const tt = yield db.getMultiple("timetables", { ownerId: user.id });
+    const tt = yield db.getMultiple("timetables", { ownerId: res.locals.user.id });
     const upnext = [];
     tt.forEach((t) => {
-        console.log(t);
-        t.days["Monday"].map((d) => {
-            console.log("d", d);
+        t.days[0].e.map((d) => {
             upnext.push({
                 name: d.name,
                 desc: `With ${d.desc} in ${d.loc}`,
@@ -130,136 +121,150 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
             });
         });
     });
-    for (const t in tt) {
-        // for (const  t.days["Monday"])
-    }
-    console.log("---", upnext);
     let schedule = {
         upnext: upnext,
+        todo: res.locals.user.todo,
     };
     res.render("dashboard", { welcomeText: welcomeText, schedule: schedule });
 }));
 /** Settings */
 router.get("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res.locals.user)
+        return res.redirect("/login");
+    let s = cms_json_1.default.forms.settings;
+    s.f.forEach((f) => {
+        if (f.t != "password")
+            f.v = res.locals.user[f.n];
+    });
     res.render("settings", {
-        settings: [
-            {
-                l: "Username",
-                t: "text",
-                n: "username",
-            },
-            {
-                l: "Email",
-                t: "email",
-                n: "email",
-            },
-            {
-                l: "Password",
-                t: "password",
-                n: "password",
-            },
-        ],
+        settings: s,
     });
 }));
-router.put("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield db.get("users", { _id: new mongodb_1.ObjectId(req.body.userId) });
-    if (!user)
-        return res.status(401).send("Could not find requested user");
-    db.updateField("users", { _id: user._id }, { settings: { "": "auughhh" } });
-    res.sendStatus(200);
+router.post("/settings", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res.locals.user)
+        return res.sendStatus(401);
+    const checkFormData = yield auth.checkFormData(req.body, "settings");
+    if (checkFormData instanceof classes_1.FormError)
+        return res.status(400).send(checkFormData);
+    // db.updateFields(
+    // 	"users",
+    // 	{ id: res.locals.user.id },
+    // 	{
+    // 		username: req?.body?.username?.toLowerCase(),
+    // 		email: req?.body?.email?.toLowerCase(),
+    // 		password: req.body.password ? bcrypt.hashSync(req.body.password, 10) : "",
+    // 		settings: {
+    // 			darkMode: req?.body?.settings?.darkMode,
+    // 		},
+    // 	}
+    // );
+    // res.sendStatus(200);
+    return res.status(400).send({ msg: "Not implemented...", fields: [""] });
+}));
+/** Todo */
+router.put("/todo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _d, _e, _f, _g;
+    if (!res.locals.user)
+        return res.redirect("/login?callback=" + req.path);
+    if (((_e = (_d = req.body) === null || _d === void 0 ? void 0 : _d.name) === null || _e === void 0 ? void 0 : _e.length) == 0 || ((_g = (_f = req.body) === null || _f === void 0 ? void 0 : _f.desc) === null || _g === void 0 ? void 0 : _g.length) == 0)
+        return res.sendStatus(400);
+    const data = db.updateFields("users", { id: res.locals.user.id, "todo._id": parseInt(req.params.id) }, { "todo.$.name": req.body.name, "todo.$.desc": req.body.desc });
+    if (req.query.callback)
+        return res.redirect(req.query.callback);
+    return res.status(200).send(data);
+}));
+router.post("/todo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _h, _j, _k, _l;
+    if (!res.locals.user)
+        return res.redirect("/login?callback=" + req.path);
+    if (((_j = (_h = req.body) === null || _h === void 0 ? void 0 : _h.name) === null || _j === void 0 ? void 0 : _j.length) == 0 || ((_l = (_k = req.body) === null || _k === void 0 ? void 0 : _k.desc) === null || _l === void 0 ? void 0 : _l.length) == 0)
+        return res.sendStatus(400);
+    const id = auth.generateId("num");
+    const data = yield db.updateFields("users", { id: res.locals.user.id }, { todo: { name: req.body.name, desc: req.body.desc, _id: id } }, false, "$push");
+    if (req.query.callback)
+        return res.redirect(req.query.callback);
+    return res.status(200).send({ name: req.body.name, desc: req.body.desc, id: id });
+}));
+router.delete("/todo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    if (!res.locals.user)
+        return res.redirect("/login?callback=" + req.path);
+    const data = yield db.updateFields("users", { id: res.locals.user.id }, { todo: { _id: parseInt(req.params.id) } }, false, "$pull");
+    if (req.query.callback)
+        return res.redirect(req.query.callback);
+    return res.sendStatus(204);
 }));
 /** Timetables */
 router.get("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-    if (req.params.id != "new") {
-        const timetable = yield db.get("timetables", { id: req.params.id });
-        if (!timetable)
-            return res.status(404).render("error", {
-                err: "404",
-                msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
-            });
-        const e = (d) => `<td class="timetable-event">
+    if (!res.locals.user)
+        return res.redirect("/login?callback=" + req.path);
+    let timetable;
+    if (req.params.id == "new") {
+        timetable = yield db.addTimetable({ ownerId: res.locals.user.id });
+        return res.redirect(`/timetable/${timetable.id}`);
+    }
+    else
+        timetable = yield db.get("timetables", { id: parseInt(req.params.id) });
+    if (!timetable)
+        return res.status(404).render("error", {
+            err: "404",
+            msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
+        });
+    if (timetable.ownerId != res.locals.user.id)
+        return res
+            .status(401)
+            .render("error", { err: "401", msg: "This isn't one of your timetables" });
+    console.log(timetable);
+    let timeline = [];
+    for (let i = 0; i < 23; i++) {
+        timeline.push(`${i}:00`);
+        timeline.push(`${i}:30`);
+    }
+    res.render("timetable", {
+        tt: timetable,
+        path: req.path,
+        timeline: timeline,
+    });
+}));
+/** Timetable event */
+router.post("/timetable/:id/:did", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const timetable = yield db.get("timetables", { id: req.params.id });
+    if (!timetable)
+        return res.status(404).render("error", {
+            err: "404",
+            msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
+        });
+    const e = (d) => `<td class="timetable-event">
 			<span contenteditable class="timetable-event-title">${d.name}</span>
 			<span contenteditable class="timetable-event-loc">${d.loc}</span><br>
 			<span contenteditable class="timetable-event-desc">${d.desc}</span>
 		</td>`;
-        const days = Object.entries(timetable.days);
-        const numPeriods = days[0][1].length;
-        const rows = [];
-        // days.map((d)=>{
-        // })
-        for (let i = 0; i < numPeriods; i++)
-            rows.push(`<td class="timetable-period">${i}</td>` + days.map((d) => e(d[1][i])).join(""));
-        res.render("timetable", {
-            tt: Object.assign(Object.assign({}, timetable), { html: {
-                    rows: rows.map((d) => `<tr>${d}</tr>`).join(""),
-                    days: days.map((d) => `<th>${d[0]}</th>`).join(""),
-                } }),
-            path: req.path,
-        });
-        // const firstRow =
-    }
-    else {
-        const timetable = {
-            id: (0, auth_1.generateId)("num"),
-            name: "New Timetable",
-            repeats: 1,
-            days: [],
-            html: {
-                rows: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-                headers: ["Day", ...util.genArrayFromRange(0, 6)],
-            },
-        };
-        res.render("timetable", { tt: timetable });
-    }
+    const days = Object.entries(timetable.days);
+    const numPeriods = days[0][1].length;
+    const rows = [];
 }));
-// /** Timetable event */
-// router.get("/timetable/:id/:eid", async (req, res) => {
-// 	const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
-// 	if (req.params.id != "new") {
-// 		const timetable = await db.get("timetables", { id: req.params.id });
-// 		if (!timetable)
-// 			return res.status(404).render("error", {
-// 				err: "404",
-// 				msg: "Couldn't find the timetable you were looking for (maybe deleted)...",
-// 			});
-// 		const e = (d: any) => `<td class="timetable-event">
-// 			<span contenteditable class="timetable-event-title">${d.name}</span>
-// 			<span contenteditable class="timetable-event-loc">${d.loc}</span><br>
-// 			<span contenteditable class="timetable-event-desc">${d.desc}</span>
-// 		</td>`;
-// 		const days: any = Object.entries(timetable.days);
-// 		const numPeriods = days[0][1].length;
-// 		const rows: any = [];
-// 		// days.map((d)=>{
-// 		// })
-// 		for (let i = 0; i < numPeriods; i++)
-// 			rows.push(
-// 				`<td class="timetable-period">${i}</td>` + days.map((d: any) => e(d[1][i])).join("")
-// 			);
-// 		res.render("timetable", {
-// 			tt: {
-// 				...timetable,
-// 				html: {
-// 					rows: rows.map((d: any) => `<tr>${d}</tr>`).join(""),
-// 					days: days.map((d: any) => `<th>${d[0]}</th>`).join(""),
-// 				},
-// 			},
-// 			path: req.path,
-// 		});
-// 		// const firstRow =
-// 	} else {
-// 		const timetable = {
-// 			id: generateId("num"),
-// 			name: "New Timetable",
-// 			repeats: 1,
-// 			days: [],
-// 			html: {
-// 				rows: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-// 				headers: ["Day", ...util.genArrayFromRange(0, 6)],
-// 			},
-// 		};
-// 		res.render("timetable", { tt: timetable });
-// 	}
-// });
+router.put("/timetable/:id/:did", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const timetable = yield db.get("timetables", { id: parseInt(req.params.id) });
+    console.log(timetable);
+    if (!timetable)
+        return res.sendStatus(404);
+    if (!Array.isArray(req.body))
+        return res.sendStatus(400);
+    console.log(req.body.map((e) => ({
+        n: e.name,
+        l: e.location,
+        d: e.duration,
+        e: e.end,
+        s: e.start,
+    })));
+    db.updateFields("timetables", { id: req.params.id, days: 0 }, {
+        "days.$.e": req.body.map((e) => ({
+            n: e.name,
+            l: e.location,
+            d: e.duration,
+            e: e.end,
+            s: e.start,
+        })),
+    });
+    res.sendStatus(200);
+}));
 exports.default = router;

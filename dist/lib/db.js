@@ -2,11 +2,7 @@
 // Avoxel284
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    var desc = Object.getOwnPropertyDescriptor(m, k);
-    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-      desc = { enumerable: true, get: function() { return m[k]; } };
-    }
-    Object.defineProperty(o, k2, desc);
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -36,11 +32,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retrieveUserTimetables = exports.updateField = exports.getMultiple = exports.get = exports.matchUser = exports.addUser = exports.checkDupAcc = exports.checkFormData = exports.getCollection = void 0;
+exports.retrieveUserTimetables = exports.updateFields = exports.getMultiple = exports.get = exports.matchUser = exports.addTimetable = exports.addUser = exports.checkDupAcc = exports.getCollection = void 0;
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
-const cms_json_1 = __importDefault(require("../cms.json"));
 const auth = __importStar(require("./auth"));
 const client = new mongodb_1.MongoClient(`mongodb+srv://${process.env.MONGODB_USERNAME}:${process.env.MONGODB_PASSWORD}@arrif.emsgrc7.mongodb.net/?retryWrites=true&w=majority`).connect();
 function getCollection(col) {
@@ -49,25 +44,6 @@ function getCollection(col) {
     });
 }
 exports.getCollection = getCollection;
-function checkFormData(data, formType) {
-    return __awaiter(this, void 0, void 0, function* () {
-        const nullFields = [];
-        const invalidFields = [];
-        cms_json_1.default.forms[formType].f.forEach((f) => {
-            if (!data[f.n])
-                return nullFields.push(f.n);
-            if (f.p && !new RegExp(f.p).test(data[f.n]))
-                return invalidFields.push(f.n);
-        });
-        if (nullFields.length > 0)
-            return { msg: "Required fields are not filled out", fields: nullFields };
-        if (invalidFields.length > 0)
-            return { msg: "Field(s) are invalid", fields: invalidFields };
-        if (data.password.length < 8)
-            return { msg: "Password must at least have 8 characters", fields: "password" };
-    });
-}
-exports.checkFormData = checkFormData;
 function checkDupAcc(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield getCollection("users");
@@ -101,12 +77,56 @@ function addUser(data) {
                 darkMode: false,
             },
             timetables: [],
+            todo: [],
             // token: auth.generateUserToken(),
         });
         return new classes_1.User(yield get("users", { _id: user.insertedId }));
     });
 }
 exports.addUser = addUser;
+function addTimetable(data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const user = yield (yield client)
+            .db("db0")
+            .collection("timetables")
+            .insertOne({
+            id: auth.generateId("num"),
+            days: [
+                {
+                    n: "Monday",
+                    e: [],
+                },
+                {
+                    n: "Tuesday",
+                    e: [],
+                },
+                {
+                    n: "Wednesday",
+                    e: [],
+                },
+                {
+                    n: "Thursday",
+                    e: [],
+                },
+                {
+                    n: "Friday",
+                    e: [],
+                },
+                {
+                    n: "Saturday",
+                    e: [],
+                },
+                {
+                    n: "Sunday",
+                    e: [],
+                },
+            ],
+            ownerId: data.ownerId,
+        });
+        return new classes_1.Timetable(yield get("timetables", { _id: user.insertedId }));
+    });
+}
+exports.addTimetable = addTimetable;
 /**
  * Compare given login data and return User from DB or formError if authorized or not
  */
@@ -147,13 +167,15 @@ function getMultiple(collection, filter) {
     });
 }
 exports.getMultiple = getMultiple;
-function updateField(collection, filter, values) {
+function updateFields(collection, filter, values, many = false, updater = "$set") {
     return __awaiter(this, void 0, void 0, function* () {
         const coll = yield getCollection(collection);
-        coll.updateOne(filter, { $set: values });
+        if (many)
+            return coll.updateMany(filter, { [updater]: values });
+        return coll.updateOne(filter, { [updater]: values });
     });
 }
-exports.updateField = updateField;
+exports.updateFields = updateFields;
 function retrieveUserTimetables(ownerId) {
     return __awaiter(this, void 0, void 0, function* () {
         const timetables = yield (yield getCollection("timetables")).findOne({

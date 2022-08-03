@@ -7,6 +7,7 @@ form {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
+	/* flex-direction: column; */
 }
 
 form input {
@@ -25,12 +26,16 @@ form input {
 	appearance: none;
 }
 
+form div {
+	flex-basis: 100%;
+}
+
 form input[type="submit"],
 form input[type="button"] {
 	cursor: pointer;
 	transition: all 0.1s;
 	flex: 1;
-	margin-top: 5px;
+	/* margin-top: 5px; */
 }
 
 form input[type="submit"]:hover,
@@ -54,7 +59,6 @@ form .form-label span {
 	background-color: var(--accent-1);
 	width: inherit;
 	word-wrap: normal;
-	/* line-height: 10px; */
 }
 
 #form-error {
@@ -79,4 +83,13 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
 	-webkit-box-shadow: 0 0 0 50px var(--accent-1) inset !important;
 	-webkit-text-fill-color: white !important;
+	caret-color: white;
+}
+
+.slim-form {
+}
+
+.slim-form input {
+	padding: 10px;
+	flex: 1;
 }
