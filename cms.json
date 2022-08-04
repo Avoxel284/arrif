@@ -50,9 +50,7 @@
 			]
 		}
 	},
-	"timetable": {
-		"days": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-	},
+	"days": ["mon", "tue", "wed", "thu", "fri", "sat", "sun"],
 	"navbar": {
 		"logoUrl": "imgs/LogoWhite.svg",
 		"pages": [
@@ -72,16 +70,12 @@
 			],
 			[
 				{
-					"u": "/timetable/",
-					"n": "My timetables"
+					"u": "/timetable/new",
+					"n": "New timetable"
 				},
 				{
 					"u": "/dashboard",
 					"n": "Dashboard"
-				},
-				{
-					"u": "/settings",
-					"n": "Settings"
 				},
 				{
 					"u": "/logout",

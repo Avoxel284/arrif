@@ -25,3 +25,8 @@ export function genArrayFromRange(start: number, end: number) {
 		.fill(0)
 		.map((_, idx) => start + idx);
 }
+
+export function timestampToMin(timestamp: string) {
+	const a = timestamp.split(":");
+	return +a[0] * 60 + +a[1];
+}

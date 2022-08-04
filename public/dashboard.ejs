@@ -11,7 +11,7 @@
 	<link rel="stylesheet" href="/style/schedule.css">
 	<link rel="stylesheet" href="/style/forms.css">
 
-	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -20,17 +20,33 @@
 	<section class="responsive-flex">
 		<div class="responsive-container">
 			<h1><%= welcomeText %>, <%= locals?.user?.username %>!</h1>
+			<% function minutesToTimestamp(min) {
+				let m = min % 60;
+				let h = (min - m) / 60;
+				return (h < 10 ? "0" : "") + h.toString() + ":" + (m < 10 ? "0" : "") + m.toString();
+			} %>
 
-			<div class="upnext">
+			<div class="todo">
 				<h2>To do</h2>
 				<% schedule.todo.forEach(e => { %>
-				<div class="schedule-todo" data-id="<%= e._id %>">
-					<div>
-						<span class="schedule-todo-title" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.name %></span>
-						<span class="schedule-todo-desc" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.desc %></span>
+				<div class="schedule-todo" title="Todo ID: <%= e._id %>" data-priority="<%= e.prio %>" data-id="<%= e._id %>">
+					<div class="top-right-icon">
+						<svg class="done-icon" style="display:none;" onclick="updateTodo(this)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+							<polyline class="cls-1" points="127.52 263.69 210.12 402.2 384.48 109.8" />
+						</svg>
+						<svg class="priority-icon" onclick="toggleTodoPriority(this)" viewBox="0 0 512 512">
+							<rect class="cls-1" x="212" y="56.98" width="88" height="265.47" rx="44" ry="44" />
+							<rect class="cls-1" x="212" y="367.02" width="88" height="88" rx="44" ry="44" />
+							<path class="cls-1" d="M139.49,453.61h-63.67c-19.33,0-35-15.67-35-35V93.39c0-19.33,15.67-35,35-35h63.67c19.33,0,35,15.67,35,35s-15.67,35-35,35h-28.67v255.22h28.67c19.33,0,35,15.67,35,35s-15.67,35-35,35Z" />
+							<path class="cls-1" d="M436.17,453.61h-63.67c-19.33,0-35-15.67-35-35s15.67-35,35-35h28.67V128.39h-28.67c-19.33,0-35-15.67-35-35s15.67-35,35-35h63.67c19.33,0,35,15.67,35,35V418.61c0,19.33-15.67,35-35,35Z" />
+						</svg>
+						<svg class="delete-icon" onclick="removeTodo(this)" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+							<path class="cls-1" d="M392.29,208.14l-40.54,235.96c-1.26,7.32-7.61,12.68-15.04,12.68h-95.75s-95.75,0-95.75,0c-7.43,0-13.78-5.35-15.04-12.68l-40.54-235.96c-1.6-9.32,5.58-17.84,15.04-17.84H377.25c9.46,0,16.64,8.52,15.04,17.84Z" />
+							<path class="cls-1" d="M366.57,88.63h0c.77-8.39-5.41-15.82-13.8-16.6l-181.93-16.74c-8.39-.77-15.82,5.41-16.6,13.8h0c-.77,8.39-8.2,14.57-16.6,13.8l-58.06-5.34c-8.39-.77-15.82,5.41-16.6,13.8l-3.23,35.07c-.77,8.39,5.41,15.82,13.8,16.6l358.83,33.02c8.39,.77,15.82-5.41,16.6-13.8l3.23-35.07c.77-8.39-5.41-15.82-13.8-16.6l-58.06-5.34c-8.39-.77-14.57-8.2-13.8-16.6Z" />
+						</svg>
 					</div>
-					<button class="schedule-todo-remove" onclick="removeTodo(this)" style="margin-left: auto; border: 1px solid red;">Remove</button>
-					<button class="schedule-todo-update" onclick="updateTodo(this)" type="submit" style="margin-left: 5px; display: none;">Update</button>
+					<span class="schedule-todo-title" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.name %></span>
+					<span class="schedule-todo-desc" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.desc %></span>
 				</div>
 				<% }) %>
 				<form class="slim-form" onsubmit="checkForm(this)" action="/todo?callback=/dashboard" method="post">
@@ -43,13 +59,35 @@
 			<div class="upnext">
 				<h2>Up next</h2>
 				<% schedule.upnext.forEach(e => { %>
-				<div class="schedule-event">
+				<div style="flex-direction: row;" class="schedule-event" onclick="window.open('/timetable/<%= e.timetable.id %>', '_self')">
 					<div>
 						<span class="schedule-event-title"><%= e.name %></span>
 						<span class="schedule-event-desc"><%= e.desc %></span>
-						<span class="schedule-event-footer"><%= e.footer %></span>
+						<span class="schedule-event-footer">From <%= e.timetable.name %> timetable</span>
 					</div>
-					<span class="schedule-event-time"><%= e.time %></span>
+					<span class="schedule-event-time"><%= minutesToTimestamp(e.start) %></span>
+				</div>
+				<% }) %>
+
+				<% if (schedule.upnext.length == 0) { %>
+				<div class="schedule-event">
+					<div>
+						<span class="schedule-event-title">Nothing!</span>
+						<span class="schedule-event-desc">How lucky are you</span>
+						<span class="schedule-event-footer"></span>
+					</div>
+					<span class="schedule-event-time"></span>
+				</div>
+				<% } %>
+			</div>
+
+			<div class="timetables">
+				<h2>My timetables</h2>
+				<% schedule.timetables.forEach(t => { %>
+				<div data-id="<%= t.id %>" title="Timetable ID: <%= t.id %>" onclick="window.open('/timetable/<%= t.id %>', '_self')" class="schedule-timetable">
+					<div>
+						<span class="schedule-timetable-title"><%= t.name %></span>
+					</div>
 				</div>
 				<% }) %>
 			</div>
@@ -65,28 +103,50 @@
 		});
 
 		function contentEditableChanged(e) {
-			$(e).parents(".schedule-todo").children(".schedule-todo-update").css("display", "block");
+			$(e).parent().parent().find(".top-right-icon .done-icon").css("display", "inline-block");
+
+		}
+
+		function toggleTodoPriority(e) {
+			const a = $(e).parent().parent().attr("data-priority") == "false";
+			console.log(a)
+			const id = $(e).parent().parent().attr("data-id");
+			$.ajax({
+				url: `/todo/${id}`,
+				headers: {
+					"content-type": "application/json"
+				},
+				data: JSON.stringify({
+					priority: a
+				}),
+				method: "PUT"
+			}).then(() => {
+				$(e).parent().parent().attr("data-priority", a);
+			})
 		}
 
 		function updateTodo(e) {
-			const id = $(e).parent().attr("data-id");
-			const inputs = $(`.schedule-todo[id='${id}'] div span[contenteditable='true']`);
-			fetch(`/todo/${id}`, {
-				body: JSON.stringify({
-					name: inputs.get(0),
-					desc: inputs.get(1)
+			const id = $(e).parent().parent().attr("data-id");
+			$.ajax({
+				url: `/todo/${id}`,
+				headers: {
+					"content-type": "application/json"
+				},
+				data: JSON.stringify({
+					name: $(`.schedule-todo[data-id="${id}"] .schedule-todo-title`).text(),
+					desc: $(`.schedule-todo[data-id="${id}"] .schedule-todo-desc`).text()
 				}),
-				method: "PUT",
+				method: "PUT"
 			})
 			$(e).css("display", "none");
 		}
 
 		function removeTodo(e) {
-			if ($(e).text() == "Remove") return $(e).text("Sure?")
-			fetch(`/todo/${$(e).parent().attr("data-id")}`, {
+			$.ajax({
+				url: `/todo/${$(e).parent().parent().attr("data-id")}`,
 				method: "DELETE"
 			})
-			$(e).parent().remove();
+			$(e).parent().parent().remove();
 		}
 	</script>
 </body>

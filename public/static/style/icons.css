@@ -1,0 +1,31 @@
+/** icons made in Illustrator, then exported as svg and embedded */
+
+/** Done Icon */
+.done-icon .cls-1 {
+	fill: none;
+	stroke: #fff;
+	stroke-linecap: round;
+	stroke-linejoin: round;
+	stroke-width: 80px;
+}
+
+.done-icon:hover * {
+	stroke: grey;
+}
+
+/** Delete Icon */
+.delete-icon .cls-1 {
+	fill: white;
+}
+
+.delete-icon:hover * {
+	fill: red;
+}
+
+/** Priority Icon */
+.priority-icon .cls-1 {
+	fill: #fff;
+}
+.priority-icon:hover * {
+	fill: grey;
+}

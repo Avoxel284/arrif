@@ -3,6 +3,7 @@
 @import url("./navbar.css");
 @import url("./mediaoverride.css");
 @import url("./modals.css");
+@import url("./icons.css");
 
 body {
 	margin: 0;
@@ -162,6 +163,26 @@ button:hover {
 
 .inline-block {
 	display: inline-block;
+}
+
+.wc {
+	opacity: 0.7;
+	font-size: 0.8em;
+	display: inline-block;
+}
+
+.top-right-icon {
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	z-index: 3;
+}
+
+.top-right-icon svg {
+	height: 30px;
+	width: 30px;
+	display: inline-block;
+	cursor: pointer;
 }
 
 *::-webkit-scrollbar {

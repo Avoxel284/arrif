@@ -50,15 +50,15 @@ export class Timetable {
 			e: [
 				{
 					/** Name of event */
-					n: string;
+					name: string;
 					/** Location of event */
-					l: string;
+					loc: string;
 					/** Description of event */
-					d: string;
+					desc: string;
 					/** Ending time in minutes since start of day */
-					e: number;
+					end: number;
 					/** Starting time in minutes since start of day */
-					s: number;
+					start: number;
 				}
 			];
 		}

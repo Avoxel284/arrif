@@ -63,37 +63,15 @@ export async function addTimetable(data: any) {
 		.collection("timetables")
 		.insertOne({
 			id: auth.generateId("num") as string,
-			days: [
-				{
-					n: "Monday",
-					e: [],
-				},
-				{
-					n: "Tuesday",
-					e: [],
-				},
-				{
-					n: "Wednesday",
-					e: [],
-				},
-				{
-					n: "Thursday",
-					e: [],
-				},
-				{
-					n: "Friday",
-					e: [],
-				},
-				{
-					n: "Saturday",
-					e: [],
-				},
-				{
-					n: "Sunday",
-					e: [],
-				},
-			],
+			name: data.name,
 			ownerId: data.ownerId,
+			"0": [],
+			"1": [],
+			"2": [],
+			"3": [],
+			"4": [],
+			"5": [],
+			"6": [],
 		});
 
 	return new Timetable(await get("timetables", { _id: user.insertedId }));
@@ -146,11 +124,7 @@ export async function updateFields(
 	return coll.updateOne(filter, { [updater]: values });
 }
 
-export async function retrieveUserTimetables(ownerId: string) {
-	const timetables = await (
-		await getCollection("timetables")
-	).findOne({
-		ownerId: ownerId,
-	});
-	return timetables;
+export async function remove(collection: string, filter: object) {
+	const coll = await getCollection(collection);
+	return await coll.deleteOne(filter);
 }

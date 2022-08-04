@@ -9,15 +9,19 @@
 	overflow: auto;
 	background-color: rgb(0, 0, 0);
 	background-color: rgba(0, 0, 0, 0.4);
+	align-content: center;
 }
 
 .modal {
-	height: 400px;
-	width: 800px;
+	height: 70vh;
+	width: 80vh;
 	display: none;
-	background-color: #fefefe;
-	margin: 15% auto;
+	background-color: var(--accent-2);
+	margin: auto;
 	padding: 20px;
-	border: 1px solid #888;
+	border: 1px solid white;
+	border-radius: 5px;
 	width: 80%;
+	overflow-y: scroll;
+	position: static !important;
 }

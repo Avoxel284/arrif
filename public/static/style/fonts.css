@@ -7,7 +7,8 @@
 }
 
 h1,
-h2 {
+h2,
+h3 {
 	font-family: "ice-cream-slant";
 	font-size: 4em;
 	color: white;
@@ -18,10 +19,14 @@ h2 {
 	margin-block-end: 0.5em;
 }
 
+h3 {
+	font-size: 1.6em;
+	margin-block-end: 0.3em;
+}
+
 p,
 a,
 span {
 	font-family: "elza-text";
 	color: white;
 }
-

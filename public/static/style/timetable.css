@@ -1,13 +1,15 @@
+body {
+	overflow: hidden;
+}
+
 .timetable {
 	width: 100%;
 	color: white;
-	/* padding: 10px; */
 	font-family: "elza-text";
 	position: relative;
 	display: block;
-	/* overflow-y: scroll; */
-	overflow: hidden;
-	height: calc(50px * 24 * 2);
+	overflow: scroll;
+	height: 70vh;
 }
 
 .timetable-timeline {
@@ -15,9 +17,9 @@
 	position: absolute;
 	top: 0;
 	left: 0;
-	height: 100%;
 	width: 100%;
 	padding-top: 50px;
+	height: calc(50px * 24 * 2);
 }
 
 .timetable-timeline ul {
@@ -55,7 +57,7 @@
 	margin-left: 60px;
 	position: relative;
 	z-index: 1;
-	height: 100%;
+	height: calc(50px * 24 * 2);
 }
 
 .timetable-events ul {
@@ -99,12 +101,12 @@
 	color: white;
 	border: solid 1px white;
 	border-radius: 5px;
-	min-width: 30px;
 	background-color: var(--accent-2);
 	display: flex;
 	flex-direction: column;
 	cursor: pointer;
 	overflow: hidden;
+	position: relative;
 }
 
 .timetable-event-name {
@@ -131,4 +133,16 @@
 
 .timetable-event * {
 	outline: none;
+}
+
+@media all and (max-height: 900px) {
+	.timetable {
+		height: 60vh;
+	}
+}
+
+@media all and (max-height: 700px) {
+	.timetable {
+		height: 40vh;
+	}
 }

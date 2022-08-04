@@ -32,7 +32,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.retrieveUserTimetables = exports.updateFields = exports.getMultiple = exports.get = exports.matchUser = exports.addTimetable = exports.addUser = exports.checkDupAcc = exports.getCollection = void 0;
+exports.remove = exports.updateFields = exports.getMultiple = exports.get = exports.matchUser = exports.addTimetable = exports.addUser = exports.checkDupAcc = exports.getCollection = void 0;
 const classes_1 = require("./classes");
 const mongodb_1 = require("mongodb");
 const bcrypt_1 = __importDefault(require("bcrypt"));
@@ -91,37 +91,15 @@ function addTimetable(data) {
             .collection("timetables")
             .insertOne({
             id: auth.generateId("num"),
-            days: [
-                {
-                    n: "Monday",
-                    e: [],
-                },
-                {
-                    n: "Tuesday",
-                    e: [],
-                },
-                {
-                    n: "Wednesday",
-                    e: [],
-                },
-                {
-                    n: "Thursday",
-                    e: [],
-                },
-                {
-                    n: "Friday",
-                    e: [],
-                },
-                {
-                    n: "Saturday",
-                    e: [],
-                },
-                {
-                    n: "Sunday",
-                    e: [],
-                },
-            ],
+            name: data.name,
             ownerId: data.ownerId,
+            "0": [],
+            "1": [],
+            "2": [],
+            "3": [],
+            "4": [],
+            "5": [],
+            "6": [],
         });
         return new classes_1.Timetable(yield get("timetables", { _id: user.insertedId }));
     });
@@ -176,12 +154,10 @@ function updateFields(collection, filter, values, many = false, updater = "$set"
     });
 }
 exports.updateFields = updateFields;
-function retrieveUserTimetables(ownerId) {
+function remove(collection, filter) {
     return __awaiter(this, void 0, void 0, function* () {
-        const timetables = yield (yield getCollection("timetables")).findOne({
-            ownerId: ownerId,
-        });
-        return timetables;
+        const coll = yield getCollection(collection);
+        return yield coll.deleteOne(filter);
     });
 }
-exports.retrieveUserTimetables = retrieveUserTimetables;
+exports.remove = remove;

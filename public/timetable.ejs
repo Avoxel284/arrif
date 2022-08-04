@@ -12,7 +12,7 @@
 	<link rel="stylesheet" href="/style/timetable.css">
 	<link rel="stylesheet" href="/style/forms.css">
 
-	<script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+	<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 
 <body>
@@ -20,9 +20,12 @@
 
 	<section class="responsive-flex">
 		<div class="responsive-container">
-			<h1><%= tt.name %></h1>
+			<h3 class="timetable-title" oninput="contentEditableChanged(this)" contenteditable="true"><%= tt.name || "Unnamed timetable" %></h3>
+
 			<div style="margin-bottom: 50px;">
-				<button class="inline-block" onclick="newEvent()">New event</button>
+				<button class="inline-block" onclick="modalController('newevent', true)">New event</button>
+				<button id="updateTimetableTitle" class="inline-block" onclick="updateTimetableTitle()">Update title</button>
+				<button id="deleteTimetable" class="inline-block" style="border-color: red;" onclick="deleteTimetable(this)">Delete timetable</button>
 			</div>
 
 			<div class="timetable">
@@ -36,18 +39,24 @@
 
 				<div class="timetable-events">
 					<ul>
-						<% tt.days.forEach(d => { %>
+						<% meta.days.forEach((d, i)=> { %>
 
-						<li data-day="<%= d.n %>" class="timetable-day">
-							<div class="timetable-day-header"><span><%= d.n %></span></div>
-							<div>
-								<% d.e.forEach(e => { %>
+						<li data-day="<%= i %>" class="timetable-day">
+							<div class="timetable-day-header"><span><%= d %></span></div>
+							<div style="position: relative">
+								<% function minutesToTimestamp(min) {
+									let m = min % 60;
+									let h = (min - m) / 60;
+									return (h < 10 ? "0" : "") + h.toString() + ":" + (m < 10 ? "0" : "") + m.toString();
+								} %>
+								<% tt[i].forEach(e => { %>
 
-								<div draggable="true" ondrag="onDrag(event)" data-start="<%= e.s %>" data-end="<%= e.e %>" data-id="<%= e.id %>" class="timetable-event" onclick="openEvent(this)" style="top: 50px;">
-									<span class="timetable-event-name"><%= e.n %></span>
-									<span class="timetable-event-desc"><%= e.d.length > 15 ? `${e.d.substring(0, 15)}...` : e.d %></span>
-									<span class="timetable-event-loc"><%= e.l %></span>
-									<span class="timetable-event-length"><%= e.s %>-<%= e.e %></span>
+								<div draggable="true" title="Event ID: <%= e.id %>" ondrag="onDrag(event)" data-day="<%= i %>" data-name="<%= e.name %>" data-desc="<%= e.desc %>" data-loc="<%= e.loc %>" 
+									data-start="<%= e.start %>" data-end="<%= e.end %>" data-id="<%= e.id %>" class="timetable-event" onclick="openEvent(this)" style="top: <%= (e.start / 1440) * 2400 %>px; height: <%= ( (e.end - e.start) / 1440) * 2400 %>px; z-index: <%= e.start %>;">
+									<span class="timetable-event-name"><%= e.name %></span>
+									<span class="timetable-event-desc"><%= e?.desc?.length > 15 ? `${e.desc.substring(0, 15)}...` : e.desc %></span>
+									<span class="timetable-event-loc"><%= e.loc %></span>
+									<span class="timetable-event-length"><%= minutesToTimestamp(e.start) %>-<%= minutesToTimestamp(e.end) %></span>
 								</div>
 
 								<% }); %>
@@ -58,29 +67,89 @@
 					</ul>
 				</div>
 			</div>
-
-
 		</div>
 	</section>
 
 	<div id="modal-bg">
 		<dialog id="newevent-dialog" class="modal">
-			<form method="dialog">
-				<input type="text">
-				<input type="submit">
+			<h2>New event</h2>
+			<form id="form" onsubmit="event.preventDefault(); newEvent(this);">
+				<div id="form-error">
+					<img src="/imgs/WarningIcon.svg" style="height: 24px" />
+					<span id="form-error-msg"></span>
+				</div>
 
+				<label class="form-label">Name</label>
+				<input required type="text" name="name">
+
+				<label class="form-label">Description</label>
+				<input type="text" name="desc">
+
+				<label class="form-label">Location</label>
+				<input type="text" name="loc">
+
+				<label class="form-label">Day</label>
+				<select required name="day">
+					<option value="0">Monday</option>
+					<option value="1">Tuesday</option>
+					<option value="2">Wednesday</option>
+					<option value="3">Thursday</option>
+					<option value="4">Friday</option>
+					<option value="5">Saturday</option>
+					<option value="6">Sunday</option>
+				</select>
+
+				<label class="form-label">Starting time</label>
+				<input required type="time" name="start">
+
+				<label class="form-label">Ending time</label>
+				<input required type="time" name="end">
+
+				<input type="submit" value="create">
+				<input onclick="modalController('newevent', false)" type="button" style="border-color: red" value="cancel">
 			</form>
 		</dialog>
 
 		<dialog id="editevent-dialog" class="modal">
-			<form method="dialog">
-				<input type="text">
-				<input type="submit">
+			<form id="form" onsubmit="event.preventDefault(); updateEvent(this);">
+				<div id="form-error" style="display:none">
+					<img src="/imgs/WarningIcon.svg" style="height: 24px" />
+					<span id="form-error-msg"></span>
+				</div>
+
+				<label class="form-label">Name</label>
+				<input required type="text" name="name">
+
+				<label class="form-label">Description</label>
+				<input type="text" name="desc">
+
+				<label class="form-label">Location</label>
+				<input type="text" name="loc">
+
+				<label class="form-label">Day</label>
+				<select required name="day">
+					<option value="0">Monday</option>
+					<option value="1">Tuesday</option>
+					<option value="2">Wednesday</option>
+					<option value="3">Thursday</option>
+					<option value="4">Friday</option>
+					<option value="5">Saturday</option>
+					<option value="6">Sunday</option>
+				</select>
+
+				<label class="form-label">Starting time</label>
+				<input required type="time" name="start">
+
+				<label class="form-label">Ending time</label>
+				<input required type="time" name="end">
+
+				<input type="submit" value="update">
+				<input onclick="modalController('editevent', false)" type="button" value="cancel">
+				<input onclick="deleteEvent(this)" type="button" style="border-color: red" value="delete">
 			</form>
 		</dialog>
 	</div>
 
-	<%- include("templates/footer.ejs"); %>
 	<%- include("templates/debug") %>
 
 	<script>
@@ -90,10 +159,64 @@
 			return (h < 10 ? "0" : "") + h.toString() + ":" + (m < 10 ? "0" : "") + m.toString();
 		}
 
+		function timestampToMinutes(time) {
+			const a = time.split(":");
+			return +a[0] * 60 + +a[1];
+		}
+
+		$(`*[contenteditable="true"]`).keypress(function(e) {
+			return e.which != 13;
+		});
+
+		function onDrag(ev) {
+			ev.dataTransfer.setData("text", {})
+		}
+
+		function contentEditableChanged(e) {
+			$(e).parents(".responsive-container").children(".schedule-todo-update").css("display", "block");
+		}
+
+		function updateTimetableTitle(e) {
+			$.ajax({
+				url: window.location.href,
+				headers: {
+					"content-type": "application/json"
+				},
+				data: JSON.stringify({
+					name: $(".timetable-title").text()
+				}),
+				method: "PUT"
+			})
+			$("#updateTitmetableTitle").css("display", "none");
+		}
+
 		function modalController(dialog, open) {
-			document.getElementById("editevent-dialog").style.display = dialog == "edit" ? "display" : "none"
-			document.getElementById("newevent-dialog").style.display = dialog == "new" ? "display" : "none"
-			document.getElementById("modal-bg").style.display = open ? "display" : "none"
+			modalIds = ["newevent", "editevent"]
+
+			if (open) {
+				$("#modal-bg").css("display", "flex");
+				modalIds.forEach(m => {
+					$(`#${m}-dialog`).css("display", dialog == m ? "block" : "none");
+					$(`#${m}-dialog`).find("#form-error").css("display", "none");
+					$(':input', `#${m}-dialog`).not(':button, :submit, :reset, :hidden')
+						.val('')
+						.prop('checked', false)
+						.prop('selected', false);
+				});
+
+			} else {
+				$("#modal-bg").css("display", "none");
+				modalIds.forEach(m => {
+					$(`#${m}-dialog`).css("display", "none");
+					$(`#${m}-dialog`).find("#form-error").css("display", "none");
+					$(':input', `#${m}-dialog`).not(':button, :submit, :reset, :hidden')
+						.val('')
+						.prop('checked', false)
+						.prop('selected', false);
+				});
+			}
+
+			return $(`#${dialog}-dialog`);
 		}
 
 		const modals = {
@@ -104,37 +227,109 @@
 		const tt = JSON.stringify("<%- tt %>");
 		const days = tt.days;
 		const getDayElem = (d) => document.querySelector(`.timetable-day[data-day="${d}"]`);
-		const genEventElem = (e) => {
-			return $(
-				`<div data-start="${e.s}" data-end="${e.e}" data-id="${e.id}" class="timetable-event" onclick="openEvent(this)" style="top: 50px;">
-<span class="timetable-event-name">${e.n}</span>
-<span class="timetable-event-desc">${e.d}</span>
-<span class="timetable-event-loc">${e.l}</span>
-<span class="timetable-event-length">${e.s}-${e.e}</span>
-</div>`)[0]
+
+		async function openEvent(e) {
+			const event = $(e);
+			const form = modalController("editevent", true)
+
+			form.find("input[name='name']").val(event.attr("data-name"))
+			form.find("input[name='desc']").val(event.attr("data-desc"))
+			form.find("select[name='day']").val(event.attr("data-day"))
+			form.find("input[name='loc']").val(event.attr("data-loc"))
+			form.find("input[name='start']").val(minutesToTimestamp(event.attr("data-start")))
+			form.find("input[name='end']").val(minutesToTimestamp(event.attr("data-end")))
+			form.attr("data-id", event.attr("data-id"))
 		}
 
-		/**
-		 * @param {Element} e
-		 */
-		function openEvent(e) {
-			const start = e.getAttribute("data-start");
-			const end = e.getAttribute("data-end");
-			console.log(minutesToTimestamp(start), end);
+		function updateEvent(t) {
+			const form = $(t);
+
+			$.ajax({
+				url: window.location.href + "/" + form.parent().attr("data-id"),
+				headers: {
+					"content-type": "application/json",
+				},
+				data: JSON.stringify({
+					name: form.find("input[name='name']").val(),
+					desc: form.find("input[name='desc']").val(),
+					loc: form.find("input[name='loc']").val(),
+					day: form.find("select[name='day']").val(),
+					start: timestampToMinutes(form.find("input[name='start']").val()),
+					end: timestampToMinutes(form.find("input[name='end']").val()),
+				}),
+				method: "PUT",
+				error: (xhr) => {
+					res = xhr.responseJSON
+					console.log(res)
+					form.find("input, select").toArray().forEach((i) => {
+						if (res.fields.includes(i.getAttribute("name"))) i.style.borderColor = "red";
+						else i.style.borderColor = "white";
+					});
+					form.find("#form-error").css("display", "block");
+					form.find("#form-error #form-error-msg").text(res.msg);
+				},
+				success: () => {
+					location.href = location.href
+				}
+			})
 		}
 
 		function newEvent(t) {
-			modalController("edit", true)
-			fetch(`/`)
+			const form = $(t);
 
-			e = genEventElem({
-				s: "au",
-				e: "e",
-				id: "feonwfmwel",
+			$.ajax({
+				url: window.location.href + "/new",
+				headers: {
+					"content-type": "application/json"
+				},
+				data: JSON.stringify({
+					name: form.find("input[name='name']").val(),
+					desc: form.find("input[name='desc']").val(),
+					loc: form.find("input[name='loc']").val(),
+					day: form.find("select[name='day']").val(),
+					start: timestampToMinutes(form.find("input[name='start']").val()),
+					end: timestampToMinutes(form.find("input[name='end']").val()),
+				}),
+				method: "POST",
+				error: (xhr) => {
+					res = xhr.responseJSON
+					console.log(res)
+					form.find("input, select").toArray().forEach((i) => {
+						if (res.fields.includes(i.getAttribute("name"))) i.style.borderColor = "red";
+						else i.style.borderColor = "white";
+					});
+					form.find("#form-error").css("display", "block");
+					form.find("#form-error #form-error-msg").text(res.msg);
+				},
+				success: () => {
+					location.href = location.href
+				}
+			})
+		}
+
+		function deleteEvent(e) {
+			const form = $(e).parent();
+			$.ajax({
+				url: window.location.href + "/" + form.parent().attr("data-id"),
+				headers: {
+					"content-type": "application/json"
+				},
+				data: JSON.stringify({
+					day: form.find("select[name='day']").val(),
+				}),
+				method: "DELETE",
+			}).then(() => {
+				location.href = location.href;
+			})
+		}
+
+		function deleteTimetable(e) {
+			if ($(e).text() == "Delete timetable") return $(e).text("Sure?")
+			$.ajax({
+				url: window.location.href,
+				method: "DELETE",
 			});
-			getDayElem("Monday").appendChild(e)
-
-
+			location.href = "/dashboard";
 		}
 	</script>
 </body>

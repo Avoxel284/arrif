@@ -2,7 +2,7 @@
 // Avoxel284
 // Util functions
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.genArrayFromRange = exports.truncateString = exports.arrayRm = void 0;
+exports.timestampToMin = exports.genArrayFromRange = exports.truncateString = exports.arrayRm = void 0;
 /**
  * Removes an element from an array and returns it
  */
@@ -30,3 +30,8 @@ function genArrayFromRange(start, end) {
         .map((_, idx) => start + idx);
 }
 exports.genArrayFromRange = genArrayFromRange;
+function timestampToMin(timestamp) {
+    const a = timestamp.split(":");
+    return +a[0] * 60 + +a[1];
+}
+exports.timestampToMin = timestampToMin;
