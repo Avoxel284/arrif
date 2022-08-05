@@ -53,6 +53,7 @@ function generateId(type = "hex") {
     if (type == "hex")
         return crypto.randomBytes(26).toString("hex");
     else if (type == "num") {
+        // hi-tech numeric id generation right here
         const time = Date.now() + Math.floor(Math.random() * 10);
         return parseInt(time.toString(8));
     }

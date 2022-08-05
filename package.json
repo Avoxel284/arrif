@@ -1,21 +1,21 @@
 {
 	"name": "arrif-backend",
 	"version": "1.0.0",
-	"description": "Arrif - The planner for anything. Backend module",
+	"description": "Arrif Backend",
 	"main": "dist/index.js",
 	"scripts": {
 		"test": "echo \"Error: no test specified\" && exit 1"
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Avoxel284/arrif-be.git"
+		"url": "git+https://github.com/Avoxel284/arrif.git"
 	},
 	"author": "Oliver B",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/Avoxel284/arrif-be/issues"
+		"url": "https://github.com/Avoxel284/arrif/issues"
 	},
-	"homepage": "https://github.com/Avoxel284/arrif-be#readme",
+	"homepage": "https://github.com/Avoxel284/arrif#readme",
 	"dependencies": {
 		"bcrypt": "^5.0.1",
 		"body-parser": "^1.20.0",
