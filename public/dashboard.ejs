@@ -66,7 +66,7 @@
 				<div style="flex-direction: row;" class="schedule-event" onclick="window.open('/timetable/<%= e.timetable.id %>', '_self')">
 					<div>
 						<span class="schedule-event-title"><%= e.name %></span>
-						<span class="schedule-event-desc"><%= e.desc %></span>
+						<span class="schedule-event-desc"><%= e.desc %><%= e.loc?.length > 0 ? ` - ${e.loc}` : ""%></span>
 						<span class="schedule-event-footer">From <%= e.timetable.name %> timetable</span>
 					</div>
 					<span class="schedule-event-time"><%= minutesToTimestamp(e.start) %></span>
@@ -77,7 +77,7 @@
 				<div class="schedule-event">
 					<div>
 						<span class="schedule-event-title">Nothing!</span>
-						<span class="schedule-event-desc">How lucky are you</span>
+						<span class="schedule-event-desc">How lucky are you?</span>
 						<span class="schedule-event-footer"></span>
 					</div>
 					<span class="schedule-event-time"></span>
@@ -91,9 +91,19 @@
 				<div data-id="<%= t.id %>" title="Timetable ID: <%= t.id %>" onclick="window.open('/timetable/<%= t.id %>', '_self')" class="schedule-timetable">
 					<div>
 						<span class="schedule-timetable-title"><%= t.name %></span>
+						<span class="schedule-timetable-desc"><%= t.desc %></span>
 					</div>
 				</div>
 				<% }) %>
+
+				<% if (schedule.timetables.length == 0) { %>
+				<div onclick="window.open('/timetable/new', '_self')" class="schedule-timetable">
+					<div>
+						<span class="schedule-timetable-title">Make a new timetable?</span>
+						<span class="schedule-timetable-desc">Go on!</span>
+					</div>
+				</div>
+				<% } %>
 			</div>
 		</div>
 	</section>
@@ -102,7 +112,7 @@
 	<%- include("templates/debug") %>
 
 	<script>
-		$(`*[contenteditable="true"]`).keypress(function(e) {
+		$(`*[contenteditable=" true"]`).keypress(function(e) {
 			return e.which != 13;
 		});
 
@@ -112,8 +122,7 @@
 
 		function checkTodoForm(e, ev) {
 			const form = $(e);
-			const formError = form.find("#form-error")
-			if (form.find(`input[name='name']`).val().length > 30) {
+			const formError = form.find("#form-error") if (form.find(`input[name='name' ]`).val().length > 30) {
 				form.find("#form-error").css("display", "block")
 				form.find(`#form-error #form-error-msg`).text("Length of name must be under 30 characters")
 				return false;

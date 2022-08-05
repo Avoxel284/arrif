@@ -117,7 +117,14 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
     todayMidnight.setHours(0, 0, 0, 0);
     const minSinceMidnight = Math.floor((today.getTime() - todayMidnight.getTime()) / (1000 * 60));
     yield tt.forEach((t) => {
-        timetables.push({ id: t.id, days: t.days, name: t.name, desc: t.desc });
+        let eventsCount = 0;
+        for (let c = 0; c < 6; c++)
+            eventsCount += t[c].length;
+        timetables.push({
+            id: t.id,
+            name: t.name,
+            desc: `Contains ${eventsCount} event${eventsCount > 1 ? "s" : ""}`,
+        });
         t[today.getDay() - 1].forEach((d) => {
             if (minSinceMidnight < d.start) {
                 d.timetable = t;

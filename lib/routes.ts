@@ -103,7 +103,14 @@ router.get("/dashboard", async (req, res) => {
 	const minSinceMidnight = Math.floor((today.getTime() - todayMidnight.getTime()) / (1000 * 60));
 
 	await tt.forEach((t) => {
-		timetables.push({ id: t.id, days: t.days, name: t.name, desc: t.desc });
+		let eventsCount = 0;
+		for (let c = 0; c < 6; c++) eventsCount += t[c].length;
+
+		timetables.push({
+			id: t.id,
+			name: t.name,
+			desc: `Contains ${eventsCount} event${eventsCount > 1 ? "s" : ""}`,
+		});
 
 		t[today.getDay() - 1].forEach((d: any) => {
 			if (minSinceMidnight < d.start) {
