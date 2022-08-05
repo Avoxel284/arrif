@@ -22,8 +22,7 @@ export function generateId(type: "num" | "hex" = "hex") {
 	if (type == "hex") return crypto.randomBytes(26).toString("hex");
 	else if (type == "num") {
 		const time = Date.now();
-		const bTime = time.toString(8);
-		return time;
+		return time.toString(8);
 	}
 	return;
 }
