@@ -21,8 +21,8 @@ export function verifyAuthToken(token: string) {
 export function generateId(type: "num" | "hex" = "hex") {
 	if (type == "hex") return crypto.randomBytes(26).toString("hex");
 	else if (type == "num") {
-		const time = Date.now();
-		return time.toString(8);
+		const time = Date.now() + Math.floor(Math.random() * 10);
+		return parseInt(time.toString(8));
 	}
 	return;
 }

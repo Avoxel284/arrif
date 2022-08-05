@@ -53,9 +53,8 @@ function generateId(type = "hex") {
     if (type == "hex")
         return crypto.randomBytes(26).toString("hex");
     else if (type == "num") {
-        const time = Date.now();
-        const bTime = time.toString(8);
-        return time;
+        const time = Date.now() + Math.floor(Math.random() * 10);
+        return parseInt(time.toString(8));
     }
     return;
 }
