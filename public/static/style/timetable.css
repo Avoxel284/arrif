@@ -10,6 +10,7 @@ body {
 	display: block;
 	overflow: scroll;
 	height: 70vh;
+	--timetable-height: calc(50px * 25 * 2);
 }
 
 .timetable-timeline {
@@ -19,7 +20,7 @@ body {
 	left: 0;
 	width: 100%;
 	padding-top: 50px;
-	height: calc(50px * 24 * 2);
+	height: var(--timetable-height);
 }
 
 .timetable-timeline ul {
@@ -57,7 +58,7 @@ body {
 	margin-left: 60px;
 	position: relative;
 	z-index: 1;
-	height: calc(50px * 24 * 2);
+	height: var(--timetable-height);
 }
 
 .timetable-events ul {
@@ -106,7 +107,8 @@ body {
 	flex-direction: column;
 	cursor: pointer;
 	overflow: hidden;
-	position: relative;
+	position: absolute;
+	width: 100%;
 }
 
 .timetable-event-name {

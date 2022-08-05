@@ -243,7 +243,7 @@ router.get("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, fun
             .status(401)
             .render("error", { err: "401", msg: "This isn't one of your timetables" });
     let timeline = [];
-    for (let i = 0; i < 23; i++) {
+    for (let i = 0; i < 24; i++) {
         timeline.push(`${i}:00`);
         timeline.push(`${i}:30`);
     }
@@ -291,7 +291,7 @@ router.post("/timetable/:id/new", (req, res) => __awaiter(void 0, void 0, void 0
         return res.sendStatus(401);
     if (!((_2 = req.body) === null || _2 === void 0 ? void 0 : _2.day) || ((_3 = req.body) === null || _3 === void 0 ? void 0 : _3.day) > 6 || ((_4 = req.body) === null || _4 === void 0 ? void 0 : _4.day) < 0)
         return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
-    if (parseFloat(req.body.start) >= parseFloat(req.body.end) + 5)
+    if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
         return res
             .status(400)
             .send({ fields: ["start", "end"], msg: "Event should at least be 5 minutes long" });
@@ -320,6 +320,10 @@ router.put("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, void 0
         return res.status(404).send("Unknown timetable");
     if (!((_5 = req.body) === null || _5 === void 0 ? void 0 : _5.day) || ((_6 = req.body) === null || _6 === void 0 ? void 0 : _6.day) > 6 || ((_7 = req.body) === null || _7 === void 0 ? void 0 : _7.day) < 0)
         return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
+    if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
+        return res
+            .status(400)
+            .send({ fields: ["start", "end"], msg: "Event should at least be 5 minutes long" });
     const schema = {
         [`${req.body.day}.$.name`]: ((_9 = (_8 = req.body) === null || _8 === void 0 ? void 0 : _8.name) === null || _9 === void 0 ? void 0 : _9.length) > 40 ? null : (_10 = req.body.name) === null || _10 === void 0 ? void 0 : _10.trim(),
         [`${req.body.day}.$.desc`]: ((_12 = (_11 = req.body) === null || _11 === void 0 ? void 0 : _11.desc) === null || _12 === void 0 ? void 0 : _12.length) > 100 ? null : (_13 = req.body.desc) === null || _13 === void 0 ? void 0 : _13.trim(),

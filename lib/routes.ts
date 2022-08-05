@@ -252,7 +252,7 @@ router.get("/timetable/:id", async (req, res) => {
 			.render("error", { err: "401", msg: "This isn't one of your timetables" });
 
 	let timeline = [];
-	for (let i = 0; i < 23; i++) {
+	for (let i = 0; i < 24; i++) {
 		timeline.push(`${i}:00`);
 		timeline.push(`${i}:30`);
 	}
@@ -307,7 +307,7 @@ router.post("/timetable/:id/new", async (req, res) => {
 	if (!req.body?.day || req.body?.day > 6 || req.body?.day < 0)
 		return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
 
-	if (parseFloat(req.body.start) >= parseFloat(req.body.end) + 5)
+	if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
 		return res
 			.status(400)
 			.send({ fields: ["start", "end"], msg: "Event should at least be 5 minutes long" });
@@ -344,6 +344,11 @@ router.put("/timetable/:id/:eid", async (req, res) => {
 	if (!timetable) return res.status(404).send("Unknown timetable");
 	if (!req.body?.day || req.body?.day > 6 || req.body?.day < 0)
 		return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
+
+	if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
+		return res
+			.status(400)
+			.send({ fields: ["start", "end"], msg: "Event should at least be 5 minutes long" });
 
 	const schema: any = {
 		[`${req.body.day}.$.name`]: req.body?.name?.length > 40 ? null : req.body.name?.trim(),
