@@ -123,7 +123,9 @@ router.get("/dashboard", async (req, res) => {
 		welcomeText: welcomeText,
 		schedule: {
 			upnext: upnext.slice(0, 3),
-			todo: res.locals.user.todo,
+			todo: res.locals.user.todo.sort((t: any) => {
+				if (t.prio) return -1;
+			}),
 			timetables: timetables,
 		},
 	});

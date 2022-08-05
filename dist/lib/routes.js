@@ -132,7 +132,10 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
         welcomeText: welcomeText,
         schedule: {
             upnext: upnext.slice(0, 3),
-            todo: res.locals.user.todo,
+            todo: res.locals.user.todo.sort((t) => {
+                if (t.prio)
+                    return -1;
+            }),
             timetables: timetables,
         },
     });
