@@ -201,7 +201,6 @@ router.post("/todo", (req, res) => __awaiter(void 0, void 0, void 0, function* (
     var _u, _v, _w, _x, _y, _z, _0, _1;
     if (!res.locals.user)
         return res.redirect("/login?callback=" + req.path);
-    const fields = [];
     if (((_v = (_u = req.body) === null || _u === void 0 ? void 0 : _u.name) === null || _v === void 0 ? void 0 : _v.length) == 0 || ((_x = (_w = req.body) === null || _w === void 0 ? void 0 : _w.desc) === null || _x === void 0 ? void 0 : _x.length) == 0)
         return res.sendStatus(400);
     if (((_z = (_y = req.body) === null || _y === void 0 ? void 0 : _y.name) === null || _z === void 0 ? void 0 : _z.length) > 30 || ((_1 = (_0 = req.body) === null || _0 === void 0 ? void 0 : _0.desc) === null || _1 === void 0 ? void 0 : _1.length) > 100)

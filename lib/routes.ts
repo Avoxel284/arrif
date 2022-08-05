@@ -196,7 +196,6 @@ router.put("/todo/:id", async (req, res) => {
 
 router.post("/todo", async (req, res) => {
 	if (!res.locals.user) return res.redirect("/login?callback=" + req.path);
-	const fields = [];
 
 	if (req.body?.name?.length == 0 || req.body?.desc?.length == 0) return res.sendStatus(400);
 	if (req.body?.name?.length > 30 || req.body?.desc?.length > 100) return res.sendStatus(400);

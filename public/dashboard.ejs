@@ -49,7 +49,11 @@
 					<span class="schedule-todo-desc" oninput="contentEditableChanged(this)" contenteditable="true"><%= e.desc %></span>
 				</div>
 				<% }) %>
-				<form class="slim-form" onsubmit="checkForm(this)" action="/todo?callback=/dashboard" method="post">
+				<form id="new-todo-form" class="slim-form" onsubmit="return checkTodoForm(this, event);" action="/todo?callback=/dashboard" method="post">
+					<div id="form-error" style="margin-bottom:0px">
+						<img src="imgs/WarningIcon.svg" style="height: 24px" />
+						<span id="form-error-msg"></span>
+					</div>
 					<input required type="text" name="name" placeholder="name of to do">
 					<input required type="text" name="desc" placeholder="description of to do">
 					<input type="submit" value="New to do">
@@ -104,12 +108,27 @@
 
 		function contentEditableChanged(e) {
 			$(e).parent().parent().find(".top-right-icon .done-icon").css("display", "inline-block");
+		}
 
+		function checkTodoForm(e, ev) {
+			const form = $(e);
+			const formError = form.find("#form-error")
+			if (form.find(`input[name='name']`).val().length > 30) {
+				form.find("#form-error").css("display", "block")
+				form.find(`#form-error #form-error-msg`).text("Length of name must be under 30 characters")
+				return false;
+			}
+			if (form.find(`input[name='desc']`).val().length > 100) {
+				ev.preventDefault();
+				form.find("#form-error").css("display", "block")
+				form.find(`#form-error #form-error-msg`).text("Length of description must be under 100 characters")
+				return false;
+			}
+			return true;
 		}
 
 		function toggleTodoPriority(e) {
 			const a = $(e).parent().parent().attr("data-priority") == "false";
-			console.log(a)
 			const id = $(e).parent().parent().attr("data-id");
 			$.ajax({
 				url: `/todo/${id}`,
