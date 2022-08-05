@@ -127,10 +127,11 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
             // if (today - day == 3) upnext.push(d);
         });
     });
+    const timeText = `${today.getMinutes()}:${today.getHours()} ${today.getDay() + 1}/${today.getMonth() + 1}/${today.getFullYear()}`;
     res.render("dashboard", {
         welcomeText: welcomeText,
         schedule: {
-            upnext: upnext,
+            upnext: upnext.slice(0, 3),
             todo: res.locals.user.todo,
             timetables: timetables,
         },

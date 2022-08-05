@@ -115,10 +115,14 @@ router.get("/dashboard", async (req, res) => {
 		});
 	});
 
+	const timeText = `${today.getMinutes()}:${today.getHours()} ${today.getDay() + 1}/${
+		today.getMonth() + 1
+	}/${today.getFullYear()}`;
+
 	res.render("dashboard", {
 		welcomeText: welcomeText,
 		schedule: {
-			upnext: upnext,
+			upnext: upnext.slice(0, 3),
 			todo: res.locals.user.todo,
 			timetables: timetables,
 		},
