@@ -30,6 +30,9 @@ function genArrayFromRange(start, end) {
         .map((_, idx) => start + idx);
 }
 exports.genArrayFromRange = genArrayFromRange;
+/**
+ * Returns a timestamp to minutes
+ */
 function timestampToMin(timestamp) {
     const a = timestamp.split(":");
     return +a[0] * 60 + +a[1];

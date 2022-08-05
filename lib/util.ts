@@ -26,6 +26,9 @@ export function genArrayFromRange(start: number, end: number) {
 		.map((_, idx) => start + idx);
 }
 
+/**
+ * Returns a timestamp to minutes
+ */
 export function timestampToMin(timestamp: string) {
 	const a = timestamp.split(":");
 	return +a[0] * 60 + +a[1];

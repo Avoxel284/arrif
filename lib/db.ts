@@ -1,6 +1,6 @@
 // Avoxel284
 
-import { FormError, User, Timetable } from "./classes";
+import { FormError, User } from "./classes";
 import { Collection, MongoClient, ReturnDocument, ServerApiVersion } from "mongodb";
 import bcrypt from "bcrypt";
 import meta from "../cms.json";
@@ -17,7 +17,6 @@ export async function getCollection(col: string) {
 
 export async function checkDupAcc(data: any) {
 	const users = await getCollection("users");
-	// await users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
 
 	const dupUser = await users.findOne({
 		$or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
@@ -45,11 +44,10 @@ export async function addUser(data: any) {
 			password: bcrypt.hashSync(data.password, 10),
 			id: auth.generateId(),
 			settings: {
+				// never got to implement this but oh well
 				darkMode: false,
 			},
-			timetables: [],
 			todo: [],
-			// token: auth.generateUserToken(),
 		});
 
 	return new User(await get("users", { _id: user.insertedId }));
@@ -74,7 +72,7 @@ export async function addTimetable(data: any) {
 			"6": [],
 		});
 
-	return new Timetable(await get("timetables", { _id: user.insertedId }));
+	return await get("timetables", { _id: user.insertedId });
 }
 
 /**

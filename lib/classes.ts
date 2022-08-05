@@ -12,8 +12,6 @@ export class User {
 		/** Super dark mode theme */
 		darkMode: boolean;
 	};
-	/** Array of the IDs of the user's timetables */
-	timetables: number[];
 	/** Array of the user's todos */
 	todo: {
 		name: string;
@@ -26,7 +24,6 @@ export class User {
 		this.email = data.email;
 		this.settings = data.settings;
 		this.id = data.id;
-		this.timetables = data.timetables;
 		this.todo = data.todo;
 	}
 }
@@ -37,40 +34,5 @@ export class FormError {
 	constructor(msg: string, fields: string[]) {
 		this.msg = msg;
 		this.fields = fields;
-	}
-}
-
-export class Timetable {
-	/** Array of days containing array of events */
-	days: [
-		{
-			/** Day name */
-			n: "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday" | "Saturday" | "Sunday";
-			/** Events */
-			e: [
-				{
-					/** Name of event */
-					name: string;
-					/** Location of event */
-					loc: string;
-					/** Description of event */
-					desc: string;
-					/** Ending time in minutes since start of day */
-					end: number;
-					/** Starting time in minutes since start of day */
-					start: number;
-				}
-			];
-		}
-	];
-	/** Timetable Id */
-	id: string;
-	/** Owner of timetable's Id */
-	ownerId: string;
-
-	constructor(data: any) {
-		this.days = data.days;
-		this.id = data.id;
-		this.ownerId = data.ownerId;
 	}
 }

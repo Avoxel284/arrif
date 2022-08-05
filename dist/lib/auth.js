@@ -61,9 +61,7 @@ function generateId(type = "hex") {
 }
 exports.generateId = generateId;
 /**
- * Generate a session token.
- *
- * @param id The user's id
+ * Generate a session token
  */
 function generateAuthToken(id) {
     return jwt.sign({ id: id }, process.env.AUTH_TOKEN, { expiresIn: "30d" });

@@ -47,7 +47,6 @@ exports.getCollection = getCollection;
 function checkDupAcc(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield getCollection("users");
-        // await users.createIndex({ type: 1 }, { collation: { locale: "en", strength: 2 } });
         const dupUser = yield users.findOne({
             $or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
         });
@@ -74,11 +73,10 @@ function addUser(data) {
             password: bcrypt_1.default.hashSync(data.password, 10),
             id: auth.generateId(),
             settings: {
+                // never got to implement this but oh well
                 darkMode: false,
             },
-            timetables: [],
             todo: [],
-            // token: auth.generateUserToken(),
         });
         return new classes_1.User(yield get("users", { _id: user.insertedId }));
     });
@@ -101,7 +99,7 @@ function addTimetable(data) {
             "5": [],
             "6": [],
         });
-        return new classes_1.Timetable(yield get("timetables", { _id: user.insertedId }));
+        return yield get("timetables", { _id: user.insertedId });
     });
 }
 exports.addTimetable = addTimetable;
