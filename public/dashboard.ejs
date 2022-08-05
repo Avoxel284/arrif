@@ -122,7 +122,8 @@
 
 		function checkTodoForm(e, ev) {
 			const form = $(e);
-			const formError = form.find("#form-error") if (form.find(`input[name='name' ]`).val().length > 30) {
+			const formError = form.find("#form-error");
+			if (form.find(`input[name='name' ]`).val().length > 30) {
 				form.find("#form-error").css("display", "block")
 				form.find(`#form-error #form-error-msg`).text("Length of name must be under 30 characters")
 				return false;
