@@ -100,6 +100,9 @@ router.get("/dashboard", async (req, res) => {
 	const todayMidnight = new Date();
 	todayMidnight.setHours(0, 0, 0, 0);
 
+	let day = today.getDay() - 1;
+	if (day == -1) day = 6;
+
 	const minSinceMidnight = Math.floor((today.getTime() - todayMidnight.getTime()) / (1000 * 60));
 
 	await tt.forEach((t) => {
@@ -112,7 +115,7 @@ router.get("/dashboard", async (req, res) => {
 			desc: `Contains ${eventsCount} event${eventsCount > 1 ? "s" : ""}`,
 		});
 
-		t[today.getDay() - 1].forEach((d: any) => {
+		t[day].forEach((d: any) => {
 			if (minSinceMidnight < d.start) {
 				d.timetable = t;
 				upnext.push(d);
@@ -121,10 +124,6 @@ router.get("/dashboard", async (req, res) => {
 			// if (today - day == 3) upnext.push(d);
 		});
 	});
-
-	const timeText = `${today.getMinutes()}:${today.getHours()} ${today.getDay() + 1}/${
-		today.getMonth() + 1
-	}/${today.getFullYear()}`;
 
 	res.render("dashboard", {
 		welcomeText: welcomeText,

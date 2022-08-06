@@ -115,6 +115,9 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
     const today = new Date();
     const todayMidnight = new Date();
     todayMidnight.setHours(0, 0, 0, 0);
+    let day = today.getDay() - 1;
+    if (day == -1)
+        day = 6;
     const minSinceMidnight = Math.floor((today.getTime() - todayMidnight.getTime()) / (1000 * 60));
     yield tt.forEach((t) => {
         let eventsCount = 0;
@@ -125,7 +128,7 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
             name: t.name,
             desc: `Contains ${eventsCount} event${eventsCount > 1 ? "s" : ""}`,
         });
-        t[today.getDay() - 1].forEach((d) => {
+        t[day].forEach((d) => {
             if (minSinceMidnight < d.start) {
                 d.timetable = t;
                 upnext.push(d);
@@ -134,7 +137,6 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
             // if (today - day == 3) upnext.push(d);
         });
     });
-    const timeText = `${today.getMinutes()}:${today.getHours()} ${today.getDay() + 1}/${today.getMonth() + 1}/${today.getFullYear()}`;
     res.render("dashboard", {
         welcomeText: welcomeText,
         schedule: {
