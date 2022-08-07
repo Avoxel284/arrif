@@ -127,7 +127,7 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
         timetables.push({
             id: t.id,
             name: t.name,
-            desc: `Contains ${eventsCount} event${eventsCount == 1 ? "s" : ""}`,
+            desc: `Contains ${eventsCount} event${eventsCount == 1 ? "" : "s"}`,
         });
         t[day].forEach((d) => {
             if (minSinceMidnight < d.start) {

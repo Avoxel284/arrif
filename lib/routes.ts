@@ -113,7 +113,7 @@ router.get("/dashboard", async (req, res) => {
 		timetables.push({
 			id: t.id,
 			name: t.name,
-			desc: `Contains ${eventsCount} event${eventsCount == 1 ? "s" : ""}`,
+			desc: `Contains ${eventsCount} event${eventsCount == 1 ? "" : "s"}`,
 		});
 
 		t[day].forEach((d: any) => {
