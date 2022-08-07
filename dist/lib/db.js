@@ -48,7 +48,7 @@ function checkDupAcc(data) {
     return __awaiter(this, void 0, void 0, function* () {
         const users = yield getCollection("users");
         const dupUser = yield users.findOne({
-            $or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
+            $or: [{ username: data.username }, { email: data.email }],
         });
         if (!dupUser)
             return;

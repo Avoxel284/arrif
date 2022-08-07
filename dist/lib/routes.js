@@ -38,14 +38,15 @@ const db = __importStar(require("./db"));
 const auth = __importStar(require("./auth"));
 const router = express_1.default.Router();
 router.use((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b, _c;
+    var _a, _b, _c, _d, _e, _f;
     const token = ((_a = req.cookies) === null || _a === void 0 ? void 0 : _a["arrif-session"]) && auth.verifyAuthToken((_b = req.cookies) === null || _b === void 0 ? void 0 : _b["arrif-session"]);
     if (token && (token === null || token === void 0 ? void 0 : token.id))
         res.locals.user = yield db.get("users", { id: token.id });
     res.locals.meta = cms_json_1.default;
     res.locals.path = req.path;
     res.locals.sessionToken = (_c = req.cookies) === null || _c === void 0 ? void 0 : _c["arrif-session"];
-    res.locals.debugMenu = process.env.NODE_ENV != "PRODUCTION";
+    res.locals.debugMenu =
+        process.env.NODE_ENV != "PRODUCTION" || ((_f = (_e = (_d = res.locals) === null || _d === void 0 ? void 0 : _d.user) === null || _e === void 0 ? void 0 : _e.settings) === null || _f === void 0 ? void 0 : _f.debug) == true;
     next();
 }));
 /** Root */
@@ -185,18 +186,18 @@ router.post("/settings", (req, res) => __awaiter(void 0, void 0, void 0, functio
 }));
 /** Todo */
 router.put("/todo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _d, _e, _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t;
+    var _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w;
     if (!res.locals.user)
         return res.redirect("/login?callback=" + req.path);
-    if (((_e = (_d = req.body) === null || _d === void 0 ? void 0 : _d.name) === null || _e === void 0 ? void 0 : _e.length) == 0 || ((_g = (_f = req.body) === null || _f === void 0 ? void 0 : _f.desc) === null || _g === void 0 ? void 0 : _g.length) == 0)
+    if (((_h = (_g = req.body) === null || _g === void 0 ? void 0 : _g.name) === null || _h === void 0 ? void 0 : _h.length) == 0 || ((_k = (_j = req.body) === null || _j === void 0 ? void 0 : _j.desc) === null || _k === void 0 ? void 0 : _k.length) == 0)
         return res.sendStatus(400);
-    if (((_j = (_h = req.body) === null || _h === void 0 ? void 0 : _h.name) === null || _j === void 0 ? void 0 : _j.length) > 30 || ((_l = (_k = req.body) === null || _k === void 0 ? void 0 : _k.desc) === null || _l === void 0 ? void 0 : _l.length) > 100)
+    if (((_m = (_l = req.body) === null || _l === void 0 ? void 0 : _l.name) === null || _m === void 0 ? void 0 : _m.length) > 30 || ((_p = (_o = req.body) === null || _o === void 0 ? void 0 : _o.desc) === null || _p === void 0 ? void 0 : _p.length) > 100)
         return res.sendStatus(400);
     // ugly but works
     const schema = {
-        "todo.$.name": ((_o = (_m = req.body) === null || _m === void 0 ? void 0 : _m.name) === null || _o === void 0 ? void 0 : _o.length) > 30 ? null : (_p = req.body.name) === null || _p === void 0 ? void 0 : _p.trim(),
-        "todo.$.desc": ((_r = (_q = req.body) === null || _q === void 0 ? void 0 : _q.desc) === null || _r === void 0 ? void 0 : _r.length) > 100 ? null : (_s = req.body.desc) === null || _s === void 0 ? void 0 : _s.trim(),
-        "todo.$.prio": typeof ((_t = req.body) === null || _t === void 0 ? void 0 : _t.priority) != "boolean" ? null : req.body.priority,
+        "todo.$.name": ((_r = (_q = req.body) === null || _q === void 0 ? void 0 : _q.name) === null || _r === void 0 ? void 0 : _r.length) > 30 ? null : (_s = req.body.name) === null || _s === void 0 ? void 0 : _s.trim(),
+        "todo.$.desc": ((_u = (_t = req.body) === null || _t === void 0 ? void 0 : _t.desc) === null || _u === void 0 ? void 0 : _u.length) > 100 ? null : (_v = req.body.desc) === null || _v === void 0 ? void 0 : _v.trim(),
+        "todo.$.prio": typeof ((_w = req.body) === null || _w === void 0 ? void 0 : _w.priority) != "boolean" ? null : req.body.priority,
     };
     for (let p in schema) {
         if (schema[p] == null || (typeof schema[p] == "string" && schema[p].length == 0))
@@ -210,12 +211,12 @@ router.put("/todo/:id", (req, res) => __awaiter(void 0, void 0, void 0, function
     return res.status(200).send(data);
 }));
 router.post("/todo", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _u, _v, _w, _x, _y, _z, _0, _1;
+    var _x, _y, _z, _0, _1, _2, _3, _4;
     if (!res.locals.user)
         return res.redirect("/login?callback=" + req.path);
-    if (((_v = (_u = req.body) === null || _u === void 0 ? void 0 : _u.name) === null || _v === void 0 ? void 0 : _v.length) == 0 || ((_x = (_w = req.body) === null || _w === void 0 ? void 0 : _w.desc) === null || _x === void 0 ? void 0 : _x.length) == 0)
+    if (((_y = (_x = req.body) === null || _x === void 0 ? void 0 : _x.name) === null || _y === void 0 ? void 0 : _y.length) == 0 || ((_0 = (_z = req.body) === null || _z === void 0 ? void 0 : _z.desc) === null || _0 === void 0 ? void 0 : _0.length) == 0)
         return res.sendStatus(400);
-    if (((_z = (_y = req.body) === null || _y === void 0 ? void 0 : _y.name) === null || _z === void 0 ? void 0 : _z.length) > 30 || ((_1 = (_0 = req.body) === null || _0 === void 0 ? void 0 : _0.desc) === null || _1 === void 0 ? void 0 : _1.length) > 100)
+    if (((_2 = (_1 = req.body) === null || _1 === void 0 ? void 0 : _1.name) === null || _2 === void 0 ? void 0 : _2.length) > 30 || ((_4 = (_3 = req.body) === null || _3 === void 0 ? void 0 : _3.desc) === null || _4 === void 0 ? void 0 : _4.length) > 100)
         return res.sendStatus(400);
     const id = auth.generateId("num");
     const data = yield db.updateFields("users", { id: res.locals.user.id }, { todo: { name: req.body.name, desc: req.body.desc, _id: id, prio: false } }, false, "$push");
@@ -289,7 +290,7 @@ router.delete("/timetable/:id", (req, res) => __awaiter(void 0, void 0, void 0, 
 }));
 /** Timetable event */
 router.post("/timetable/:id/new", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _2, _3, _4;
+    var _5, _6, _7;
     const timetable = yield db.get("timetables", {
         id: parseInt(req.params.id),
         ownerId: res.locals.user.id,
@@ -298,7 +299,7 @@ router.post("/timetable/:id/new", (req, res) => __awaiter(void 0, void 0, void 0
         return res.status(404).send("Unknown timetable");
     if (timetable.ownerId != res.locals.user.id)
         return res.sendStatus(401);
-    if (!((_2 = req.body) === null || _2 === void 0 ? void 0 : _2.day) || ((_3 = req.body) === null || _3 === void 0 ? void 0 : _3.day) > 6 || ((_4 = req.body) === null || _4 === void 0 ? void 0 : _4.day) < 0)
+    if (!((_5 = req.body) === null || _5 === void 0 ? void 0 : _5.day) || ((_6 = req.body) === null || _6 === void 0 ? void 0 : _6.day) > 6 || ((_7 = req.body) === null || _7 === void 0 ? void 0 : _7.day) < 0)
         return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
     if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
         return res
@@ -318,7 +319,7 @@ router.post("/timetable/:id/new", (req, res) => __awaiter(void 0, void 0, void 0
     return res.send(yield db.get("timetables", { id: parseInt(req.params.id) }));
 }));
 router.put("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18;
+    var _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, _21;
     if (!res.locals.user)
         return res.redirect("/login?callback=" + req.path);
     const timetable = yield db.get("timetables", {
@@ -327,18 +328,18 @@ router.put("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, void 0
     });
     if (!timetable)
         return res.status(404).send("Unknown timetable");
-    if (!((_5 = req.body) === null || _5 === void 0 ? void 0 : _5.day) || ((_6 = req.body) === null || _6 === void 0 ? void 0 : _6.day) > 6 || ((_7 = req.body) === null || _7 === void 0 ? void 0 : _7.day) < 0)
+    if (!((_8 = req.body) === null || _8 === void 0 ? void 0 : _8.day) || ((_9 = req.body) === null || _9 === void 0 ? void 0 : _9.day) > 6 || ((_10 = req.body) === null || _10 === void 0 ? void 0 : _10.day) < 0)
         return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
     if (parseFloat(req.body.start) + 5 >= parseFloat(req.body.end))
         return res
             .status(400)
             .send({ fields: ["start", "end"], msg: "Event should at least be 5 minutes long" });
     const schema = {
-        [`${req.body.day}.$.name`]: ((_9 = (_8 = req.body) === null || _8 === void 0 ? void 0 : _8.name) === null || _9 === void 0 ? void 0 : _9.length) > 40 ? null : (_10 = req.body.name) === null || _10 === void 0 ? void 0 : _10.trim(),
-        [`${req.body.day}.$.desc`]: ((_12 = (_11 = req.body) === null || _11 === void 0 ? void 0 : _11.desc) === null || _12 === void 0 ? void 0 : _12.length) > 100 ? null : (_13 = req.body.desc) === null || _13 === void 0 ? void 0 : _13.trim(),
-        [`${req.body.day}.$.loc`]: ((_15 = (_14 = req.body) === null || _14 === void 0 ? void 0 : _14.loc) === null || _15 === void 0 ? void 0 : _15.length) > 100 ? null : (_16 = req.body.loc) === null || _16 === void 0 ? void 0 : _16.trim(),
-        [`${req.body.day}.$.start`]: (_17 = req.body) === null || _17 === void 0 ? void 0 : _17.start,
-        [`${req.body.day}.$.end`]: (_18 = req.body) === null || _18 === void 0 ? void 0 : _18.end,
+        [`${req.body.day}.$.name`]: ((_12 = (_11 = req.body) === null || _11 === void 0 ? void 0 : _11.name) === null || _12 === void 0 ? void 0 : _12.length) > 40 ? null : (_13 = req.body.name) === null || _13 === void 0 ? void 0 : _13.trim(),
+        [`${req.body.day}.$.desc`]: ((_15 = (_14 = req.body) === null || _14 === void 0 ? void 0 : _14.desc) === null || _15 === void 0 ? void 0 : _15.length) > 100 ? null : (_16 = req.body.desc) === null || _16 === void 0 ? void 0 : _16.trim(),
+        [`${req.body.day}.$.loc`]: ((_18 = (_17 = req.body) === null || _17 === void 0 ? void 0 : _17.loc) === null || _18 === void 0 ? void 0 : _18.length) > 100 ? null : (_19 = req.body.loc) === null || _19 === void 0 ? void 0 : _19.trim(),
+        [`${req.body.day}.$.start`]: (_20 = req.body) === null || _20 === void 0 ? void 0 : _20.start,
+        [`${req.body.day}.$.end`]: (_21 = req.body) === null || _21 === void 0 ? void 0 : _21.end,
     };
     for (let p in schema) {
         if (schema[p] == null || (typeof schema[p] == "string" && schema[p].length == 0))
@@ -348,7 +349,7 @@ router.put("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, void 0
     res.sendStatus(200);
 }));
 router.delete("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _19, _20, _21;
+    var _22, _23, _24;
     if (!res.locals.user)
         return res.redirect("/login?callback=" + req.path);
     const timetable = yield db.get("timetables", {
@@ -357,7 +358,7 @@ router.delete("/timetable/:id/:eid", (req, res) => __awaiter(void 0, void 0, voi
     });
     if (!timetable)
         return res.status(404).send("Unknown timetable");
-    if (!((_19 = req.body) === null || _19 === void 0 ? void 0 : _19.day) || ((_20 = req.body) === null || _20 === void 0 ? void 0 : _20.day) > 6 || ((_21 = req.body) === null || _21 === void 0 ? void 0 : _21.day) < 0)
+    if (!((_22 = req.body) === null || _22 === void 0 ? void 0 : _22.day) || ((_23 = req.body) === null || _23 === void 0 ? void 0 : _23.day) > 6 || ((_24 = req.body) === null || _24 === void 0 ? void 0 : _24.day) < 0)
         return res.status(400).send({ fields: ["day"], msg: "Day is invalid" });
     const data = yield db.updateFields("timetables", { id: parseInt(req.params.id) }, { [req.body.day]: { id: parseInt(req.params.eid) } }, false, "$pull");
     return res.sendStatus(200);

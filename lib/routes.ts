@@ -19,7 +19,8 @@ router.use(async (req, res, next) => {
 	res.locals.meta = meta;
 	res.locals.path = req.path;
 	res.locals.sessionToken = req.cookies?.["arrif-session"];
-	res.locals.debugMenu = process.env.NODE_ENV != "PRODUCTION";
+	res.locals.debugMenu =
+		process.env.NODE_ENV != "PRODUCTION" || res.locals?.user?.settings?.debug == true;
 	next();
 });
 

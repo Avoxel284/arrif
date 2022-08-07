@@ -19,7 +19,7 @@ export async function checkDupAcc(data: any) {
 	const users = await getCollection("users");
 
 	const dupUser = await users.findOne({
-		$or: [{ username: { $regex: new RegExp(`^${data.username}`, "i") } }, { email: data.email }],
+		$or: [{ username: data.username }, { email: data.email }],
 	});
 
 	if (!dupUser) return;
