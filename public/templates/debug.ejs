@@ -3,6 +3,7 @@
 	<span><b>DEBUG MENU</b></span><br>
 	<span>USER ID: <%= locals?.user?.id %></span><br>
 	<span>USERNAME: <%= locals?.user?.username %></span><br>
+	<span>EPOCH TIME: <%= new Date().getTime() %></span><br>
 	<span>SESSION TOKEN: <%= locals?.sessionToken %></span><br>
 </div>
 <% } %>
