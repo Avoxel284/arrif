@@ -106,9 +106,9 @@ router.get("/dashboard", (req, res) => __awaiter(void 0, void 0, void 0, functio
         return res.redirect("/login");
     const hours = new Date().getHours();
     let welcomeText = "Morning";
-    if (hours > 12 && hours < 18)
+    if (hours >= 12 && hours < 18)
         welcomeText = "Afternoon";
-    else if (hours > 18)
+    else if (hours >= 18)
         welcomeText = "Evening";
     const tt = yield db.getMultiple("timetables", { ownerId: res.locals.user.id });
     const upnext = [];
